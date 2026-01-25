@@ -1,0 +1,20 @@
+# Run From The Beast - Rewards
+
+file_version: 1
+rewards:
+  enabled: true
+
+  # Rewards for the Beast winning
+  beast_win:
+    - "baa credits give -s {player} 50"
+    - "baa xp give -s {player} 75"
+
+  # Rewards for the runners winning
+  runners_win:
+    - "baa credits give -s {player} 35"
+    - "baa xp give -s {player} 60"
+
+  # Rewards for participating
+  participation:
+    - "baa credits give -s {player} 10"
+    - "baa xp give -s {player} 20"

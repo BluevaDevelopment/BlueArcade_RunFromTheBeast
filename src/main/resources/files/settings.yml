@@ -1,0 +1,60 @@
+# Run From The Beast - Settings
+
+file_version: 1
+# Visual representation in menus
+menus:
+  vote:
+    item: DRAGON_HEAD
+
+game:
+  # Seconds the beast stays locked before being released
+  release_delay_seconds: 15
+  # Allow the beast to open the shared armory chest/menu
+  allow_beast_loot: true
+  # Visual gear applied to the beast on start (set to AIR to skip a slot)
+  beast_equipment:
+    enabled: true
+    helmet: DRAGON_HEAD
+    chestplate: DIAMOND_CHESTPLATE
+    leggings: DIAMOND_LEGGINGS
+    boots: DIAMOND_BOOTS
+    main_hand: DIAMOND_SWORD
+
+distance_bar:
+  enabled: true
+  min_distance: 3.0
+  max_distance: 60.0
+  update_interval_ticks: 10
+
+items:
+  # Items to give runners on game start (MATERIAL:AMOUNT:SLOT)
+  starting_items: []
+  # Items to give the beast on start
+  beast_items: []
+
+effects:
+  # Effects applied to all players on start
+  starting_effects:
+    - "SPEED:600:1"
+  # Effects applied to the beast on start
+  beast_effects:
+    - "DAMAGE_RESISTANCE:400:1"
+  # Effects when respawning after falling/void/death-blocks
+  respawn_effects:
+    - "DAMAGE_RESISTANCE:60:2"
+
+checkpoints:
+  default_uses: 5
+  items:
+    set: NETHER_STAR
+    return: ENDER_EYE
+
+armory:
+  # Items used when no chest is configured or chest is empty
+  fallback_items:
+    - "IRON_SWORD:1"
+    - "SHIELD:1"
+    - "IRON_HELMET:1"
+    - "IRON_CHESTPLATE:1"
+    - "IRON_LEGGINGS:1"
+    - "IRON_BOOTS:1"

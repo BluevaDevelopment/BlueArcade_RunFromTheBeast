@@ -1,0 +1,12 @@
+name: Run From The Beast
+id: run_from_the_beast
+version: 1.0.0
+type: MINIGAME
+api-version: 1.0
+main: net.blueva.arcade.modules.runfromthebeast.RunFromTheBeastModule
+
+authors:
+  - Blueva
+  - Whiron
+
+description: "Escape the beast, gear up from chests, and fight back together!"
