@@ -93,6 +93,7 @@ public class RunFromTheBeastGameManager {
         state.setTimeLeftSeconds(getGameTime(context));
         state.setReleaseTimeSeconds(moduleConfig.getInt("game.release_delay_seconds", 15));
         state.setCageBlocks(cageService.loadCageBlocks(context));
+        cageService.restoreCage(context, state);
         stateRegistry.registerGame(context, state);
 
         messagingService.sendDescription(context);
@@ -104,6 +105,11 @@ public class RunFromTheBeastGameManager {
         if (state == null) {
             state = new RunFromTheBeastArenaState();
             stateRegistry.registerGame(context, state);
+        }
+
+        state.setReleaseTimeSeconds(moduleConfig.getInt("game.release_delay_seconds", 15));
+        if (state.getCageBlocks().isEmpty()) {
+            state.setCageBlocks(cageService.loadCageBlocks(context));
         }
 
         beastService.selectBeast(context, state);
