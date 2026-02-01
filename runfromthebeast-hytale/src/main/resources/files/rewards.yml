@@ -1,0 +1,20 @@
+# Run From The Beast - Rewards
+
+file_version: 1
+rewards:
+  enabled: true
+
+  # Rewards for the Beast winning
+  beast_win:
+    - "baa credits --action=give --target={player} --amount=50"
+    - "baa xp --action=give --target={player} --amount=75"
+
+  # Rewards for the runners winning
+  runners_win:
+    - "baa credits --action=give --target={player} --amount=35"
+    - "baa xp --action=give --target={player} --amount=60"
+
+  # Rewards for participating
+  participation:
+    - "baa credits --action=give --target={player} --amount=10"
+    - "baa xp --action=give --target={player} --amount=20"

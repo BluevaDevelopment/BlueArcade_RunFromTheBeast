@@ -1,0 +1,69 @@
+package net.blueva.arcade.modules.runfromthebeast.listener;
+
+import com.hypixel.hytale.component.Archetype;
+import com.hypixel.hytale.component.ArchetypeChunk;
+import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.component.query.Query;
+import com.hypixel.hytale.component.system.EntityEventSystem;
+import com.hypixel.hytale.math.vector.Location;
+import com.hypixel.hytale.server.core.entity.Entity;
+import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.event.events.ecs.DropItemEvent;
+import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.universe.world.meta.BlockState;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import net.blueva.arcade.api.game.GameContext;
+import net.blueva.arcade.modules.runfromthebeast.game.RunFromTheBeastGameManager;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+public class RunFromTheBeastItemDropListener extends EntityEventSystem<EntityStore, DropItemEvent.PlayerRequest> {
+
+    private final RunFromTheBeastGameManager gameManager;
+
+    public RunFromTheBeastItemDropListener(RunFromTheBeastGameManager gameManager) {
+        super(DropItemEvent.PlayerRequest.class);
+        this.gameManager = gameManager;
+    }
+
+    @Override
+    public void handle(int index,
+                       @Nonnull ArchetypeChunk<EntityStore> archetypeChunk,
+                       @Nonnull Store<EntityStore> store,
+                       @Nonnull CommandBuffer<EntityStore> commandBuffer,
+                       @Nonnull DropItemEvent.PlayerRequest event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
+        Ref<EntityStore> ref = archetypeChunk.getReferenceTo(index);
+        if (ref == null) {
+            return;
+        }
+
+        PlayerRef playerRef = store.getComponent(ref, PlayerRef.getComponentType());
+        Player player = store.getComponent(ref, Player.getComponentType());
+        if (playerRef == null || player == null) {
+            return;
+        }
+
+        GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context =
+                gameManager.getGameContext(player);
+        if (context == null || !context.hasPlayer(player)) {
+            return;
+        }
+
+        event.setCancelled(true);
+    }
+
+    @Nullable
+    @Override
+    public Query<EntityStore> getQuery() {
+        return Archetype.empty();
+    }
+}

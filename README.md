@@ -47,6 +47,14 @@ Finish the setup with the commands below:
 - **Minigame ID:** `run_from_the_beast`
 - **Module Type:** `MINIGAME`
 
+## Hytale edition notes
+- The Hytale edition requires downloading HytaleServer from https://support.hytale.com/hc/en-us/articles/45326769420827-Hytale-Server-Manual. It is not included because it requires authentication.
+
+## Building individual editions
+If you only need one edition, you can build it on its own:
+- `mvn clean package -pl runfromthebeast-minecraft -am`
+- `mvn clean package -pl runfromthebeast-hytale -am`
+
 ## Links & Support
 - Website: https://www.blueva.net
 - Documentation: https://docs.blueva.net/books/blue-arcade

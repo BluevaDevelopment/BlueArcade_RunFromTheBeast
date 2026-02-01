@@ -1,0 +1,64 @@
+# Run From The Beast - Settings
+
+file_version: 1
+# Visual representation in menus
+menus:
+  vote:
+    item: Weapon_Longsword_Iron
+
+game:
+  # Seconds the beast stays locked before being released
+  release_delay_seconds: 15
+  # Allow the beast to open the shared armory chest/menu
+  allow_beast_loot: true
+  # Visual gear applied to the beast on start (set to AIR to skip a slot)
+  beast_equipment:
+    enabled: true
+    helmet: Armor_Iron_Head
+    chestplate: Armor_Iron_Chest
+    leggings: Armor_Iron_Legs
+    boots: Armor_Iron_Hands
+    main_hand: Weapon_Longsword_Iron
+
+distance_bar:
+  enabled: true
+  min_distance: 3.0
+  max_distance: 60.0
+  update_interval_ticks: 10
+
+items:
+  # Items to give runners on game start (ITEM_ID:AMOUNT:SLOT)
+  starting_items: []
+  # Items to give the beast on start
+  beast_items: []
+
+effects:
+  # Effects applied to all players on start
+  starting_effects:
+    - "SPEED:600:1"
+  # Effects applied to the beast on start
+  beast_effects:
+    - "DAMAGE_RESISTANCE:400:1"
+  # Effects when respawning after falling/void/death-blocks
+  respawn_effects:
+    - "DAMAGE_RESISTANCE:60:2"
+
+checkpoints:
+  default_uses: 5
+  items:
+    set: Ability_Checkpoint_Set
+    return: Ability_Checkpoint_Return
+
+armory:
+  # Items available in armory chests (each player gets their own copy)
+  items:
+    - "Weapon_Daggers_Iron:1"
+    - "Weapon_Shortbow_Combat:1"
+    - "Weapon_Arrow_Crude:16"
+    - "Armor_Iron_Head"
+    - "Armor_Iron_Chest"
+    - "Armor_Iron_Legs"
+    - "Armor_Iron_Hands"
+    - "Food_Wildmeat_Cooked:3"
+    - "Potion_Health:2"
+    - "Potion_Stamina:2"

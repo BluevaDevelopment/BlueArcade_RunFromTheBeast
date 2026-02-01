@@ -1,0 +1,209 @@
+file_version: 1
+# List of category keys to register
+categories:
+  - root
+  - beast_skins
+  - zappers
+  - kits
+  - beast_pass
+
+weights:
+  beast_pass:
+    default: 1
+    bonus: 3
+
+category_settings:
+  root:
+    id: rftb_store
+    name: "Run From The Beast"
+    icon: Weapon_Sword_Mithril
+    description:
+      - "<gray>All Run From The Beast cosmetics and perks.</gray>"
+      - "<gray>Everything you unlock works in every arena.</gray>"
+      - "<gray> </gray>"
+      - "<yellow>Browse categories below to gear up.</yellow>"
+    enabled: true
+    type: group
+    selection_enabled: false
+    sort_order: 10
+    items:
+      order: []
+  beast_skins:
+    id: rftb_beast_skins
+    name: "Beast Skins"
+    icon: Weapon_Shortbow_Iron
+    description:
+      - "<gray>Change the Beast's appearance between rounds.</gray>"
+      - "<gray>Purely cosmetic looks that stay unlocked forever.</gray>"
+      - "<gray> </gray>"
+      - "<yellow>Pick a look that matches your mood.</yellow>"
+    enabled: true
+    type: selection
+    parent_id: rftb_store
+    selection_enabled: true
+    random_selection_enabled: true
+    random_item:
+      display_name: "Random Beast Skin"
+      icon: Container_Chest
+      description:
+        - "<gray>Select a random unlocked skin.</gray>"
+    sort_order: 10
+    items:
+      order: [creeper, villager, jeb]
+      creeper:
+        name: "Creeper"
+        icon: Weapon_Longsword_Wood
+        price: 150
+        enabled: true
+        default_unlocked: false
+        description:
+          - "<gray>Classic green menace with a grin.</gray>"
+          - "<gray>Perfect for jump scares.</gray>"
+      villager:
+        name: "Villager"
+        icon: Food_Wildmeat_Cooked
+        price: 100
+        enabled: true
+        default_unlocked: false
+        description:
+          - "<gray>Trade vibes, no trades required.</gray>"
+          - "<gray>Nods knowingly at your prey.</gray>"
+      jeb:
+        name: "Jeb Sheep"
+        icon: Weapon_Arrow_Crude
+        price: 1000
+        enabled: true
+        default_unlocked: false
+        description:
+          - "<gray>Rainbow shimmer on every chase.</gray>"
+          - "<gray>Named in honor of Jeb_.</gray>"
+  zappers:
+    id: rftb_zappers
+    name: "Zappers"
+    icon: Weapon_Longsword_Wood
+    description:
+      - "<gray>Upgrade the zapper you wield as the Beast.</gray>"
+      - "<gray>Higher tiers hit harder and last longer.</gray>"
+      - "<gray> </gray>"
+      - "<yellow>Keep runners at bay with better shocks.</yellow>"
+    enabled: true
+    type: selection
+    parent_id: rftb_store
+    selection_enabled: true
+    random_selection_enabled: true
+    random_item:
+      display_name: "Random Zapper"
+      icon: Container_Chest
+      description:
+        - "<gray>Pick a random unlocked zapper.</gray>"
+    sort_order: 20
+    items:
+      order: [wood, stone, iron, diamond]
+      wood:
+        name: "Wood Zapper"
+        icon: Weapon_Longsword_Wood
+        price: 0
+        enabled: true
+        default_unlocked: true
+        description:
+          - "<gray>Entry-level zapper, gets the job done.</gray>"
+          - "<gray>Reliable starter gear.</gray>"
+      stone:
+        name: "Stone Zapper"
+        icon: Weapon_Longsword_Stone
+        price: 200
+        enabled: true
+        default_unlocked: false
+        description:
+          - "<gray>Heavier hits with sturdier stone.</gray>"
+          - "<gray>Great early upgrade.</gray>"
+      iron:
+        name: "Iron Zapper"
+        icon: Weapon_Longsword_Iron
+        price: 600
+        enabled: true
+        default_unlocked: false
+        description:
+          - "<gray>Durable zapper built for long hunts.</gray>"
+          - "<gray>Better reach, better control.</gray>"
+      diamond:
+        name: "Diamond Zapper"
+        icon: Weapon_Sword_Mithril
+        price: 1500
+        enabled: true
+        default_unlocked: false
+        description:
+          - "<gray>Top-tier zapper for relentless Beasts.</gray>"
+          - "<gray>Premium shock and longevity.</gray>"
+  kits:
+    id: rftb_kits
+    name: "Beast Kits"
+    icon: Container_Chest
+    description:
+      - "<gray>Start with useful tools and consumables.</gray>"
+      - "<gray>Pick the kit that matches your Beast playstyle.</gray>"
+      - "<gray> </gray>"
+      - "<yellow>Swap kits between games freely.</yellow>"
+    enabled: true
+    type: selection
+    parent_id: rftb_store
+    selection_enabled: true
+    random_selection_enabled: true
+    random_item:
+      display_name: "Random Kit"
+      icon: Container_Chest
+      description:
+        - "<gray>Choose a random unlocked kit.</gray>"
+    sort_order: 30
+    items:
+      order: [shredder, swiftness, reset_wand]
+      shredder:
+        name: "Shredder Plates"
+        icon: Weapon_Arrow_Crude
+        price: 50
+        enabled: true
+        default_unlocked: false
+        description:
+          - "<gray>Drop plates to slow fleeing runners.</gray>"
+          - "<gray>Useful for chokepoints.</gray>"
+      swiftness:
+        name: "Swiftness Potion"
+        icon: Food_Wildmeat_Cooked
+        price: 10
+        enabled: true
+        default_unlocked: false
+        description:
+          - "<gray>Short burst of speed for quick catches.</gray>"
+          - "<gray>Lightweight and affordable.</gray>"
+      reset_wand:
+        name: "Reset Wand"
+        icon: Weapon_Shortbow_Iron
+        price: 60
+        enabled: true
+        default_unlocked: false
+        description:
+          - "<gray>Reset nearby traps with a click.</gray>"
+          - "<gray>Great for mid-run control.</gray>"
+  beast_pass:
+    id: rftb_beast_pass
+    name: "Beast Pass"
+    icon: Weapon_Sword_Mithril
+    description:
+      - "<gray>Buy once to unlock premium Beast rewards.</gray>"
+      - "<gray>Permanent pass without any selection step.</gray>"
+      - "<gray> </gray>"
+      - "<yellow>Includes perks across all RFTB arenas.</yellow>"
+    enabled: true
+    type: purchase_only
+    parent_id: rftb_store
+    selection_enabled: false
+    sort_order: 5
+    items:
+      order: [pass]
+      pass:
+        name: "Beast Pass"
+        icon: Weapon_Sword_Mithril
+        price: 80
+        enabled: true
+        default_unlocked: false
+        description: []
