@@ -15,7 +15,7 @@ import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.meta.BlockState;
+import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.protocol.packets.interface_.Page;
 import com.hypixel.hytale.component.Store;
@@ -35,7 +35,7 @@ public class RunFromTheBeastArmoryService {
     }
 
     public void openArmory(Player player,
-                           GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+                           GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                            RunFromTheBeastArenaState state,
                            Vector3i blockPosition) {
         boolean allowBeast = moduleConfig.getBoolean("game.allow_beast_loot", true);

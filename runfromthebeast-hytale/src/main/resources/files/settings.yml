@@ -1,6 +1,6 @@
 # Run From The Beast - Settings
 
-file_version: 1
+file_version: 2
 # Visual representation in menus
 menus:
   vote:
@@ -9,6 +9,11 @@ menus:
 game:
   # Seconds the beast stays locked before being released
   release_delay_seconds: 15
+  # Configure what happens when someone falls into the void/out-of-bounds.
+  # Available values: RESPAWN, ELIMINATE
+  void_fall:
+    runners_action: RESPAWN
+    beast_action: RESPAWN
   # Allow the beast to open the shared armory chest/menu
   allow_beast_loot: true
   # Visual gear applied to the beast on start (set to AIR to skip a slot)

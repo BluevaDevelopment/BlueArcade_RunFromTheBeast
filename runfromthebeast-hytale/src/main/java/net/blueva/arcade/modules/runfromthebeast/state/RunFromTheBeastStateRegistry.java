@@ -6,7 +6,7 @@ import com.hypixel.hytale.server.core.entity.Entity;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.meta.BlockState;
+import com.hypixel.hytale.component.Holder;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,11 +16,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class RunFromTheBeastStateRegistry {
 
-    private final Map<Integer, GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity>> activeGames = new ConcurrentHashMap<>();
+    private final Map<Integer, GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity>> activeGames = new ConcurrentHashMap<>();
     private final Map<UUID, Integer> playerArenas = new ConcurrentHashMap<>();
     private final Map<Integer, RunFromTheBeastArenaState> gameStates = new ConcurrentHashMap<>();
 
-    public void registerGame(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void registerGame(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                              RunFromTheBeastArenaState state) {
         int arenaId = context.getArenaId();
         activeGames.put(arenaId, context);
@@ -30,7 +30,7 @@ public class RunFromTheBeastStateRegistry {
         }
     }
 
-    public GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> getGameContext(Player player) {
+    public GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> getGameContext(Player player) {
         if (player == null) {
             return null;
         }
@@ -51,7 +51,7 @@ public class RunFromTheBeastStateRegistry {
         playerArenas.entrySet().removeIf(entry -> entry.getValue().equals(arenaId));
     }
 
-    public Collection<GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity>> getActiveGames() {
+    public Collection<GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity>> getActiveGames() {
         return new ArrayList<>(activeGames.values());
     }
 

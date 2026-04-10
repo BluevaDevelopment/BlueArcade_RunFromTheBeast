@@ -7,7 +7,7 @@ import com.hypixel.hytale.server.core.entity.Entity;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.meta.BlockState;
+import com.hypixel.hytale.component.Holder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +20,7 @@ public class RunFromTheBeastCageService {
         this.configHelper = configHelper;
     }
 
-    public List<String> loadCageBlocks(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context) {
+    public List<String> loadCageBlocks(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context) {
         List<?> raw = context.getDataAccess().getGameData("game.beast_cage.blocks", List.class);
         if (raw == null) {
             return new ArrayList<>();
@@ -33,7 +33,7 @@ public class RunFromTheBeastCageService {
         return result;
     }
 
-    public void clearCage(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void clearCage(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                           RunFromTheBeastArenaState state) {
         if (state.getCageBlocks().isEmpty()) {
             Location min = context.getDataAccess().getGameLocation("game.beast_cage.bounds.min");
@@ -47,7 +47,7 @@ public class RunFromTheBeastCageService {
         clearSavedCageBlocks(context, state.getCageBlocks());
     }
 
-    public void restoreCage(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void restoreCage(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                             RunFromTheBeastArenaState state) {
         if (state == null || state.getCageBlocks().isEmpty()) {
             return;
@@ -55,7 +55,7 @@ public class RunFromTheBeastCageService {
         applySavedCageBlocks(context, state.getCageBlocks());
     }
 
-    private void clearSavedCageBlocks(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    private void clearSavedCageBlocks(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                       List<String> blockData) {
         for (String entry : blockData) {
             String[] parts = entry.split(",");
@@ -92,7 +92,7 @@ public class RunFromTheBeastCageService {
         }
     }
 
-    private void applySavedCageBlocks(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    private void applySavedCageBlocks(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                       List<String> blockData) {
         for (String entry : blockData) {
             String[] parts = entry.split(",");

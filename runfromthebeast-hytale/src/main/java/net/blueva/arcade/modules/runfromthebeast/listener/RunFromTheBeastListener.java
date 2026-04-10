@@ -10,7 +10,7 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.event.events.player.PlayerInteractEvent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.meta.BlockState;
+import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.math.vector.Location;
 
 public class RunFromTheBeastListener {
@@ -31,7 +31,7 @@ public class RunFromTheBeastListener {
             return;
         }
 
-        GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context =
+        GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context =
                 module.getGameContext(player);
         if (context == null || !context.isPlayerPlaying(player)) {
             return;

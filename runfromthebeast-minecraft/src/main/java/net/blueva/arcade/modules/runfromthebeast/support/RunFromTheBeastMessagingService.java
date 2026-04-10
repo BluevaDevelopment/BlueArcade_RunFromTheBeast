@@ -110,6 +110,7 @@ public class RunFromTheBeastMessagingService {
         placeholders.put("runners_alive", String.valueOf(runnersAlive));
         placeholders.put("release_time", String.valueOf(Math.max(state.getReleaseTimeSeconds(), 0)));
         placeholders.put("checkpoint_uses", String.valueOf(state.getCheckpointUses().getOrDefault(player.getUniqueId(), 0)));
+        placeholders.put("time", String.valueOf(state.getTimeLeftSeconds()));
         return placeholders;
     }
 
@@ -177,6 +178,11 @@ public class RunFromTheBeastMessagingService {
     public void broadcastBeastKill(GameContext<Player, Location, World, Material, ItemStack, Sound, Block, Entity> context,
                                    Player victim,
                                    Player beast) {
+        // Don't broadcast death messages for spectators
+        if (context.getSpectators().contains(victim)) {
+            return;
+        }
+
         String message = getRandomMessage("messages.deaths.killed_by_beast");
         if (message == null) {
             return;

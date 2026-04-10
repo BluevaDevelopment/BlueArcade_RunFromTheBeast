@@ -12,7 +12,7 @@ import com.hypixel.hytale.server.core.inventory.Inventory;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.meta.BlockState;
+import com.hypixel.hytale.component.Holder;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ public class RunFromTheBeastCheckpointService {
         this.configHelper = configHelper;
     }
 
-    public void giveCheckpointItems(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void giveCheckpointItems(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                     Player player,
                                     RunFromTheBeastArenaState state) {
         int defaultUses = moduleConfig.getInt("checkpoints.default_uses", 1);
@@ -54,7 +54,7 @@ public class RunFromTheBeastCheckpointService {
         return configHelper.getItemIdSafe(moduleConfig.getString("checkpoints.items.return"), "Ability_Checkpoint_Return");
     }
 
-    public void handleCheckpointSet(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void handleCheckpointSet(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                     Player player,
                                     RunFromTheBeastArenaState state) {
         int uses = state.getCheckpointUses().getOrDefault(player.getUuid(), 0);
@@ -62,20 +62,21 @@ public class RunFromTheBeastCheckpointService {
             context.getMessagesAPI().sendRaw(player, moduleConfig.getStringFrom("language.yml", "messages.checkpoint.no_uses"));
             return;
         }
+        context.getSchedulerAPI().runAtEntity(player, () -> {
+            Location location = resolvePlayerLocation(player);
+            if (location == null) {
+                context.getMessagesAPI().sendRaw(player, moduleConfig.getStringFrom("language.yml", "messages.checkpoint.none"));
+                return;
+            }
 
-        Location location = resolvePlayerLocation(player);
-        if (location == null) {
-            context.getMessagesAPI().sendRaw(player, moduleConfig.getStringFrom("language.yml", "messages.checkpoint.none"));
-            return;
-        }
-
-        state.getCheckpoints().put(player.getUuid(), location);
-        state.getCheckpointUses().put(player.getUuid(), uses - 1);
-        context.getMessagesAPI().sendRaw(player, moduleConfig.getStringFrom("language.yml", "messages.checkpoint.set")
-                .replace("{uses}", String.valueOf(uses - 1)));
+            state.getCheckpoints().put(player.getUuid(), location);
+            state.getCheckpointUses().put(player.getUuid(), uses - 1);
+            context.getMessagesAPI().sendRaw(player, moduleConfig.getStringFrom("language.yml", "messages.checkpoint.set")
+                    .replace("{uses}", String.valueOf(uses - 1)));
+        });
     }
 
-    public void handleCheckpointReturn(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void handleCheckpointReturn(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                        Player player,
                                        RunFromTheBeastArenaState state) {
         Location checkpoint = state.getCheckpoints().get(player.getUuid());
@@ -84,17 +85,16 @@ public class RunFromTheBeastCheckpointService {
             return;
         }
 
-        context.getSchedulerAPI().runLater("checkpoint_return_" + player.getUuid(),
-                () -> {
-                    if (player.getTransformComponent() != null) {
-                        player.getTransformComponent().teleportPosition(checkpoint.getPosition());
-                        player.getTransformComponent().teleportRotation(checkpoint.getRotation());
-                    }
-                }, 0L);
+        context.getSchedulerAPI().runAtEntity(player, () -> {
+            if (player.getTransformComponent() != null) {
+                player.getTransformComponent().teleportPosition(checkpoint.getPosition());
+                player.getTransformComponent().teleportRotation(checkpoint.getRotation());
+            }
+        });
         context.getMessagesAPI().sendRaw(player, moduleConfig.getStringFrom("language.yml", "messages.checkpoint.teleported"));
     }
 
-    private ItemStack decorateCheckpointItem(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    private ItemStack decorateCheckpointItem(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                              String itemId,
                                              String name,
                                              List<String> lore) {

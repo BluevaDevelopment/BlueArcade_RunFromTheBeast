@@ -28,7 +28,7 @@ public class RunFromTheBeastSetup implements GameSetupHandler {
 
     private boolean handleInternal(SetupContext<Player, CommandSender, Location> context) {
         if (!context.hasHandlerArgs(1)) {
-            context.getMessagesAPI().send(context.getPlayer(),
+            context.getMessagesAPI().sendRaw(context.getPlayer(),
                     module.moduleConfig.getStringFrom("language.yml", "setup_messages.usage"));
             return true;
         }
@@ -39,7 +39,7 @@ public class RunFromTheBeastSetup implements GameSetupHandler {
             case "beastspawn" -> handleBeastSpawn(context);
             case "beastzone" -> handleBeastZone(context);
             default -> {
-                context.getMessagesAPI().send(context.getPlayer(),
+                context.getMessagesAPI().sendRaw(context.getPlayer(),
                         module.coreConfig.getLanguage("admin_commands.errors.unknown_subcommand"));
                 yield true;
             }
@@ -84,7 +84,7 @@ public class RunFromTheBeastSetup implements GameSetupHandler {
 
         if (!hasBeastSpawn || !hasCage) {
             if (context.getSender() != null && context.isPlayer()) {
-                context.getMessagesAPI().send(context.getPlayer(),
+                context.getMessagesAPI().sendRaw(context.getPlayer(),
                         module.moduleConfig.getStringFrom("language.yml", "setup_messages.not_configured")
                                 .replace("{arena_id}", String.valueOf(context.getArenaId())));
             }
@@ -99,7 +99,7 @@ public class RunFromTheBeastSetup implements GameSetupHandler {
         }
 
         if (!context.hasHandlerArgs(1) || !"set".equalsIgnoreCase(context.getHandlerArg(0))) {
-            context.getMessagesAPI().send(context.getPlayer(),
+            context.getMessagesAPI().sendRaw(context.getPlayer(),
                     module.moduleConfig.getStringFrom("language.yml", "setup_messages.usage_beast_spawn"));
             return true;
         }
@@ -108,7 +108,7 @@ public class RunFromTheBeastSetup implements GameSetupHandler {
         context.getData().setLocation("game.beast.spawn", player.getLocation());
         context.getData().save();
 
-        context.getMessagesAPI().send(player,
+        context.getMessagesAPI().sendRaw(player,
                 module.moduleConfig.getStringFrom("language.yml", "setup_messages.beast_spawn_set"));
         return true;
     }
@@ -119,7 +119,7 @@ public class RunFromTheBeastSetup implements GameSetupHandler {
         }
 
         if (!context.hasHandlerArgs(1) || !"set".equalsIgnoreCase(context.getHandlerArg(0))) {
-            context.getMessagesAPI().send(context.getPlayer(),
+            context.getMessagesAPI().sendRaw(context.getPlayer(),
                     module.moduleConfig.getStringFrom("language.yml", "setup_messages.usage_beast_zone"));
             return true;
         }
@@ -127,7 +127,7 @@ public class RunFromTheBeastSetup implements GameSetupHandler {
         Player player = context.getPlayer();
 
         if (!context.getSelection().hasCompleteSelection(player)) {
-            context.getMessagesAPI().send(player,
+            context.getMessagesAPI().sendRaw(player,
                     module.moduleConfig.getStringFrom("language.yml", "setup_messages.must_use_stick"));
             return true;
         }
@@ -145,7 +145,7 @@ public class RunFromTheBeastSetup implements GameSetupHandler {
 
     private boolean requirePlayer(SetupContext<Player, CommandSender, Location> context) {
         if (!context.isPlayer()) {
-            context.getMessagesAPI().send(context.getPlayer(),
+            context.getMessagesAPI().sendRaw(context.getPlayer(),
                     module.coreConfig.getLanguage("admin_commands.errors.must_be_player"));
             return false;
         }
@@ -161,7 +161,7 @@ public class RunFromTheBeastSetup implements GameSetupHandler {
         int z = (int) Math.abs(pos2.getZ() - pos1.getZ()) + 1;
         int blocks = x * y * z;
 
-        context.getMessagesAPI().send(context.getPlayer(),
+        context.getMessagesAPI().sendRaw(context.getPlayer(),
                 module.moduleConfig.getStringFrom("language.yml", messagePath)
                         .replace("{blocks}", String.valueOf(blocks))
                         .replace("{x}", String.valueOf(x))

@@ -8,7 +8,7 @@ import com.hypixel.hytale.server.core.entity.Entity;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.meta.BlockState;
+import com.hypixel.hytale.component.Holder;
 
 public class RunFromTheBeastDistanceService {
 
@@ -18,13 +18,13 @@ public class RunFromTheBeastDistanceService {
         this.moduleConfig = moduleConfig;
     }
 
-    public void updateDistanceBars(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void updateDistanceBars(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                    RunFromTheBeastArenaState state,
                                    Player beast) {
         // Distance bars are not yet implemented in Hytale.
     }
 
-    public void resetDistanceBars(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context) {
+    public void resetDistanceBars(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context) {
         // Distance bars are not yet implemented in Hytale.
     }
 

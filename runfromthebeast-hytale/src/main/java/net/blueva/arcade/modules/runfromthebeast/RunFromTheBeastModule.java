@@ -39,12 +39,12 @@ import com.hypixel.hytale.server.core.entity.Entity;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.meta.BlockState;
+import com.hypixel.hytale.component.Holder;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class RunFromTheBeastModule implements GameModule<Player, Location, World, String, ItemStack, String, BlockState, Entity, EventSubscription<?>, Short> {
+public class RunFromTheBeastModule implements GameModule<Player, Location, World, String, ItemStack, String, Holder, Entity, EventSubscription<?>, Short> {
 
     private static final String MODULE_ID = "run_from_the_beast";
 
@@ -131,18 +131,18 @@ public class RunFromTheBeastModule implements GameModule<Player, Location, World
     }
 
     @Override
-    public void onStart(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context) {
+    public void onStart(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context) {
         gameManager.onStart(context);
     }
 
     @Override
-    public void onCountdownTick(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void onCountdownTick(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                 int secondsLeft) {
         messagingService.sendCountdownTick(context, secondsLeft);
     }
 
     @Override
-    public void onCountdownFinish(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context) {
+    public void onCountdownFinish(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context) {
         messagingService.sendCountdownFinish(context);
     }
 
@@ -152,12 +152,12 @@ public class RunFromTheBeastModule implements GameModule<Player, Location, World
     }
 
     @Override
-    public void onGameStart(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context) {
+    public void onGameStart(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context) {
         gameManager.onGameStart(context);
     }
 
     @Override
-    public void onEnd(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void onEnd(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                       GameResult<Player> result) {
         gameManager.onEnd(context, result);
     }
@@ -175,56 +175,19 @@ public class RunFromTheBeastModule implements GameModule<Player, Location, World
 
         new RunFromTheBeastListener(this).register(registry);
 
-        try {
-            java.lang.reflect.Method registerEntityEventSystem = registry.getClass()
-                    .getMethod("registerSystem", com.hypixel.hytale.component.system.EntityEventSystem.class);
-            registerEntityEventSystem.invoke(registry, new RunFromTheBeastDamageListener(gameManager));
-            registerEntityEventSystem.invoke(registry, new RunFromTheBeastItemDropListener(gameManager));
-            registerEntityEventSystem.invoke(registry, new RunFromTheBeastChestSystem(this));
-
-            registerDeathSystem(registry);
+        if (registry instanceof net.blueva.arcade.api.events.hytale.HytaleEventRegistry hytaleRegistry) {
+            hytaleRegistry.registerSystem(new RunFromTheBeastDamageListener(gameManager));
+            hytaleRegistry.registerSystem(new RunFromTheBeastItemDropListener(gameManager));
+            hytaleRegistry.registerSystem(new RunFromTheBeastChestSystem(this));
+            hytaleRegistry.registerSystem(new RunFromTheBeastDeathSystem(gameManager));
             systemsRegistered = true;
-        } catch (java.lang.reflect.InvocationTargetException e) {
-            if (isAlreadyRegistered(e.getCause())) {
-                systemsRegistered = true;
-                return;
-            }
-            throw new RuntimeException("Failed to register Run From The Beast systems", e);
-        } catch (Exception e) {
-            if (isAlreadyRegistered(e)) {
-                systemsRegistered = true;
-                return;
-            }
-            throw new RuntimeException("Failed to register Run From The Beast systems", e);
         }
-    }
-
-    private void registerDeathSystem(CustomEventRegistry<EventSubscription<?>, Short> registry) throws Exception {
-        RunFromTheBeastDeathSystem deathSystem = new RunFromTheBeastDeathSystem(gameManager);
-
-        java.lang.reflect.Field pluginField = registry.getClass().getDeclaredField("plugin");
-        pluginField.setAccessible(true);
-        Object plugin = pluginField.get(registry);
-
-        Object entityStoreRegistry = plugin.getClass().getMethod("getEntityStoreRegistry").invoke(plugin);
-
-        entityStoreRegistry.getClass()
-                .getMethod("registerSystem", com.hypixel.hytale.component.system.ISystem.class)
-                .invoke(entityStoreRegistry, deathSystem);
-    }
-
-    private boolean isAlreadyRegistered(Throwable error) {
-        if (!(error instanceof IllegalArgumentException)) {
-            return false;
-        }
-        String message = error.getMessage();
-        return message != null && message.contains("already registered");
     }
 
     @Override
     public Map<String, String> getCustomPlaceholders(Player player) {
         Map<String, String> placeholders = new HashMap<>();
-        GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context = getGameContext(player);
+        GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context = getGameContext(player);
         if (context == null) {
             return placeholders;
         }
@@ -241,23 +204,23 @@ public class RunFromTheBeastModule implements GameModule<Player, Location, World
         return placeholders;
     }
 
-    public GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> getGameContext(Player player) {
+    public GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> getGameContext(Player player) {
         return stateRegistry.getGameContext(player);
     }
 
-    public RunFromTheBeastArenaState getArenaState(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context) {
+    public RunFromTheBeastArenaState getArenaState(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context) {
         if (context == null) {
             return null;
         }
         return stateRegistry.getState(context.getArenaId());
     }
 
-    public boolean isBeast(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context, Player player) {
+    public boolean isBeast(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context, Player player) {
         RunFromTheBeastArenaState state = getArenaState(context);
         return state != null && gameManager.isBeast(context, state, player);
     }
 
-    public void handleCheckpointSet(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void handleCheckpointSet(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                     Player player) {
         RunFromTheBeastArenaState state = getArenaState(context);
         if (state != null) {
@@ -265,7 +228,7 @@ public class RunFromTheBeastModule implements GameModule<Player, Location, World
         }
     }
 
-    public void handleCheckpointReturn(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void handleCheckpointReturn(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                        Player player) {
         RunFromTheBeastArenaState state = getArenaState(context);
         if (state != null) {
@@ -273,13 +236,13 @@ public class RunFromTheBeastModule implements GameModule<Player, Location, World
         }
     }
 
-    public void handleOutOfBounds(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void handleOutOfBounds(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                   Player player,
                                   boolean deathBlock) {
         gameManager.handleOutOfBounds(context, player, deathBlock);
     }
 
-    public void handleDamage(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void handleDamage(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                              Player victim,
                              Player killer) {
         RunFromTheBeastArenaState state = getArenaState(context);
@@ -287,7 +250,7 @@ public class RunFromTheBeastModule implements GameModule<Player, Location, World
     }
 
     public void openArmory(Player player,
-                           GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+                           GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                            Vector3i blockPosition) {
         RunFromTheBeastArenaState state = getArenaState(context);
         gameManager.openArmory(player, context, state, blockPosition);

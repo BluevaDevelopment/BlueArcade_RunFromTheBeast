@@ -9,7 +9,7 @@ import com.hypixel.hytale.server.core.entity.Entity;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.meta.BlockState;
+import com.hypixel.hytale.component.Holder;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ public class RunFromTheBeastRewardService {
         this.moduleConfig = moduleConfig;
     }
 
-    public void distributeTeamRewards(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void distributeTeamRewards(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                       boolean beastWon,
                                       Player beast,
                                       List<Player> runnerWinners) {

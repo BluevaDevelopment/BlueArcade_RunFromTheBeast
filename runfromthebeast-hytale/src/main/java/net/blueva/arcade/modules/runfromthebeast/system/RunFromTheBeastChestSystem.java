@@ -18,7 +18,7 @@ import com.hypixel.hytale.server.core.event.events.ecs.UseBlockEvent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.meta.BlockState;
+import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nonnull;
@@ -58,7 +58,7 @@ public class RunFromTheBeastChestSystem extends EntityEventSystem<EntityStore, U
             return;
         }
 
-        GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context =
+        GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context =
                 module.getGameContext(player);
         if (context == null || !context.isPlayerPlaying(player)) {
             return;

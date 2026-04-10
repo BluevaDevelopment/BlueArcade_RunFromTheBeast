@@ -14,7 +14,7 @@ import com.hypixel.hytale.server.core.entity.Entity;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.meta.BlockState;
+import com.hypixel.hytale.component.Holder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,7 +32,7 @@ public class RunFromTheBeastBeastService {
         this.storeAPI = storeAPI;
     }
 
-    public void selectBeast(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void selectBeast(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                             RunFromTheBeastArenaState state) {
         List<Player> candidates = new ArrayList<>(context.getPlayers());
         if (candidates.isEmpty()) {
@@ -57,7 +57,7 @@ public class RunFromTheBeastBeastService {
         teleportBeastToCage(context, chosen);
     }
 
-    public Player getBeast(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public Player getBeast(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                            RunFromTheBeastArenaState state) {
         if (state.getBeastId() == null) {
             return null;
@@ -70,13 +70,13 @@ public class RunFromTheBeastBeastService {
         return null;
     }
 
-    public void applyBeastGlow(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void applyBeastGlow(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                RunFromTheBeastArenaState state,
                                Player beast) {
         // Glow effects are not yet available in Hytale.
     }
 
-    public void removeBeastGlow(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void removeBeastGlow(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                 RunFromTheBeastArenaState state) {
         // No-op until Hytale glow effects are available.
     }
@@ -97,7 +97,7 @@ public class RunFromTheBeastBeastService {
         return weights;
     }
 
-    private void teleportBeastToCage(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    private void teleportBeastToCage(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                      Player beast) {
         Location beastSpawn = context.getDataAccess().getGameLocation("game.beast.spawn");
         if (beastSpawn != null) {

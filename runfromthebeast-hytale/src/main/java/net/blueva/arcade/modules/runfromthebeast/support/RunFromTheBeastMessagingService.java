@@ -10,7 +10,7 @@ import com.hypixel.hytale.server.core.entity.Entity;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.meta.BlockState;
+import com.hypixel.hytale.component.Holder;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +32,7 @@ public class RunFromTheBeastMessagingService {
         this.configHelper = configHelper;
     }
 
-    public void sendDescription(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context) {
+    public void sendDescription(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context) {
         List<String> description = moduleConfig.getStringListFrom("language.yml", "description");
 
         for (Player player : context.getPlayers()) {
@@ -42,7 +42,7 @@ public class RunFromTheBeastMessagingService {
         }
     }
 
-    public void sendCountdownTick(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void sendCountdownTick(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                   int secondsLeft) {
         for (Player player : context.getPlayers()) {
             context.getSoundsAPI().play(player, coreConfig.getSound("sounds.starting_game.countdown"));
@@ -59,7 +59,7 @@ public class RunFromTheBeastMessagingService {
         }
     }
 
-    public void sendCountdownFinish(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context) {
+    public void sendCountdownFinish(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context) {
         for (Player player : context.getPlayers()) {
             String title = coreConfig.getLanguage("titles.game_started.title")
                     .replace("{game_display_name}", moduleInfo.getName());
@@ -73,7 +73,7 @@ public class RunFromTheBeastMessagingService {
         }
     }
 
-    public void sendActionBar(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void sendActionBar(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                               RunFromTheBeastArenaState state,
                               Player player,
                               Map<String, String> placeholders) {
@@ -87,7 +87,7 @@ public class RunFromTheBeastMessagingService {
         context.getScoreboardAPI().update(player, placeholders);
     }
 
-    public Map<String, String> buildCustomPlaceholders(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public Map<String, String> buildCustomPlaceholders(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                                        RunFromTheBeastArenaState state,
                                                        Player player,
                                                        Player beast, int runnersAlive) {
@@ -100,7 +100,7 @@ public class RunFromTheBeastMessagingService {
         return placeholders;
     }
 
-    public void sendBeastTitle(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void sendBeastTitle(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                Player beast) {
         String title = moduleConfig.getStringFrom("language.yml", "titles.beast.title");
         String subtitle = moduleConfig.getStringFrom("language.yml", "titles.beast.subtitle");
@@ -112,7 +112,7 @@ public class RunFromTheBeastMessagingService {
         context.getTitlesAPI().sendRaw(beast, title, subtitle, 0, 40, 10);
     }
 
-    public void sendEliminatedTitle(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void sendEliminatedTitle(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                     Player player) {
         String title = moduleConfig.getStringFrom("language.yml", "titles.eliminated.title");
         String subtitle = moduleConfig.getStringFrom("language.yml", "titles.eliminated.subtitle");
@@ -124,7 +124,7 @@ public class RunFromTheBeastMessagingService {
         context.getTitlesAPI().sendRaw(player, title, subtitle, 0, 60, 20);
     }
 
-    public void sendOutcomeMessage(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void sendOutcomeMessage(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                    String multilinePath,
                                    String fallbackLine,
                                    Map<String, String> placeholders) {
@@ -147,7 +147,7 @@ public class RunFromTheBeastMessagingService {
         }
     }
 
-    public void sendVictoryTitles(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void sendVictoryTitles(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                   String basePath,
                                   Map<String, String> placeholders) {
         String rawTitle = moduleConfig.getStringFrom("language.yml", basePath + ".title");
@@ -165,7 +165,7 @@ public class RunFromTheBeastMessagingService {
         }
     }
 
-    public void showFinalScoreboard(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void showFinalScoreboard(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                     String path,
                                     Map<String, String> placeholders) {
         for (Player player : context.getPlayers()) {
@@ -173,9 +173,14 @@ public class RunFromTheBeastMessagingService {
         }
     }
 
-    public void broadcastBeastKill(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void broadcastBeastKill(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                    Player victim,
                                    Player beast) {
+        // Don't broadcast death messages for spectators
+        if (context.getSpectators().contains(victim)) {
+            return;
+        }
+
         String message = getRandomMessage("messages.deaths.killed_by_beast");
         if (message == null) {
             return;

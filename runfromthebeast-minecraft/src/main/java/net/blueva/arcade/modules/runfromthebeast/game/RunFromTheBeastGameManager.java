@@ -188,18 +188,54 @@ public class RunFromTheBeastGameManager {
     public void handleOutOfBounds(GameContext<Player, Location, World, Material, ItemStack, Sound, Block, Entity> context,
                                   Player player,
                                   boolean deathBlock) {
+        RunFromTheBeastArenaState state = stateRegistry.getState(context.getArenaId());
+        if (state == null || state.isEnded()) {
+            return;
+        }
+
+        VoidFallAction action = resolveVoidFallAction(context, state, player);
+        if (action == VoidFallAction.ELIMINATE) {
+            handleDamage(context, state, player, null);
+            broadcastOutOfBoundsMessage(context, player, deathBlock);
+            return;
+        }
+
         Location deathLocation = player.getLocation();
         playVisualEffects(player, null, deathLocation);
         context.respawnPlayer(player);
         loadoutService.applyStartingEffects(player, "effects.respawn_effects");
+        broadcastOutOfBoundsMessage(context, player, deathBlock);
+    }
 
+    private VoidFallAction resolveVoidFallAction(GameContext<Player, Location, World, Material, ItemStack, Sound, Block, Entity> context,
+                                                 RunFromTheBeastArenaState state,
+                                                 Player player) {
+        String path = isBeast(context, state, player) ? "game.void_fall.beast_action" : "game.void_fall.runners_action";
+        String value = moduleConfig.getString(path, VoidFallAction.RESPAWN.name());
+
+        if (value == null || value.isBlank()) {
+            return VoidFallAction.RESPAWN;
+        }
+
+        try {
+            return VoidFallAction.valueOf(value.trim().toUpperCase());
+        } catch (IllegalArgumentException ignored) {
+            return VoidFallAction.RESPAWN;
+        }
+    }
+
+    private void broadcastOutOfBoundsMessage(GameContext<Player, Location, World, Material, ItemStack, Sound, Block, Entity> context,
+                                             Player player,
+                                             boolean deathBlock) {
         String path = deathBlock ? "messages.deaths.death_block" : "messages.deaths.void";
         String message = messagingService.getRandomMessage(path);
-        if (message != null) {
-            message = message.replace("{player}", player.getName());
-            for (Player target : context.getPlayers()) {
-                context.getMessagesAPI().sendRaw(target, message);
-            }
+        if (message == null) {
+            return;
+        }
+
+        message = message.replace("{player}", player.getName());
+        for (Player target : context.getPlayers()) {
+            context.getMessagesAPI().sendRaw(target, message);
         }
     }
 
@@ -208,6 +244,11 @@ public class RunFromTheBeastGameManager {
                              Player victim,
                              Player killer) {
         if (state == null || state.isEnded()) {
+            return;
+        }
+
+        // Don't process damage for spectators
+        if (context.getSpectators().contains(victim)) {
             return;
         }
 
@@ -243,6 +284,11 @@ public class RunFromTheBeastGameManager {
                 handleBeastVictory(context, state, beast);
             }
         }
+    }
+
+    private enum VoidFallAction {
+        RESPAWN,
+        ELIMINATE
     }
 
     private void playVisualEffects(Player victim, Player killer, Location deathLocation) {

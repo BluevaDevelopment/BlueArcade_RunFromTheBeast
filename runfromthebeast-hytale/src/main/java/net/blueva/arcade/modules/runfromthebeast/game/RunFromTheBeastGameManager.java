@@ -30,7 +30,7 @@ import com.hypixel.hytale.server.core.entity.entities.player.HiddenPlayersManage
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.meta.BlockState;
+import com.hypixel.hytale.component.Holder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -82,7 +82,7 @@ public class RunFromTheBeastGameManager {
         this.configHelper = configHelper;
     }
 
-    public void onStart(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context) {
+    public void onStart(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context) {
         int arenaId = context.getArenaId();
 
         context.getSummarySettings().setGameSummaryEnabled(false);
@@ -101,7 +101,7 @@ public class RunFromTheBeastGameManager {
         messagingService.sendDescription(context);
     }
 
-    public void onGameStart(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context) {
+    public void onGameStart(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context) {
         int arenaId = context.getArenaId();
         RunFromTheBeastArenaState state = stateRegistry.getState(arenaId);
         if (state == null) {
@@ -117,7 +117,7 @@ public class RunFromTheBeastGameManager {
         startMovementTracking(context, state);
     }
 
-    public void onEnd(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void onEnd(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                       GameResult<Player> result) {
         int arenaId = context.getArenaId();
         RunFromTheBeastArenaState state = stateRegistry.getState(arenaId);
@@ -136,7 +136,7 @@ public class RunFromTheBeastGameManager {
     }
 
     public void onDisable() {
-        for (GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context : new ArrayList<>(stateRegistry.getActiveGames())) {
+        for (GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context : new ArrayList<>(stateRegistry.getActiveGames())) {
             context.getSchedulerAPI().cancelModuleTasks(moduleInfo.getId());
             RunFromTheBeastArenaState state = stateRegistry.getState(context.getArenaId());
             cageService.restoreCage(context, state);
@@ -151,23 +151,23 @@ public class RunFromTheBeastGameManager {
         stateRegistry.clear();
     }
 
-    public Player getBeast(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public Player getBeast(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                            RunFromTheBeastArenaState state) {
         return beastService.getBeast(context, state);
     }
 
-    public GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> getGameContext(Player player) {
+    public GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> getGameContext(Player player) {
         return stateRegistry.getGameContext(player);
     }
 
-    public RunFromTheBeastArenaState getArenaState(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context) {
+    public RunFromTheBeastArenaState getArenaState(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context) {
         if (context == null) {
             return null;
         }
         return stateRegistry.getState(context.getArenaId());
     }
 
-    public List<Player> getAliveRunners(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public List<Player> getAliveRunners(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                         RunFromTheBeastArenaState state) {
         List<Player> alive = new ArrayList<>(context.getAlivePlayers());
         Player beast = getBeast(context, state);
@@ -178,47 +178,88 @@ public class RunFromTheBeastGameManager {
     }
 
     public void openArmory(Player player,
-                           GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+                           GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                            RunFromTheBeastArenaState state,
                            Vector3i blockPosition) {
         armoryService.openArmory(player, context, state, blockPosition);
     }
 
-    public void handleCheckpointSet(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void handleCheckpointSet(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                     Player player,
                                     RunFromTheBeastArenaState state) {
         checkpointService.handleCheckpointSet(context, player, state);
     }
 
-    public void handleCheckpointReturn(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void handleCheckpointReturn(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                        Player player,
                                        RunFromTheBeastArenaState state) {
         checkpointService.handleCheckpointReturn(context, player, state);
     }
 
-    public void handleOutOfBounds(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public void handleOutOfBounds(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                   Player player,
                                   boolean deathBlock) {
+        RunFromTheBeastArenaState state = stateRegistry.getState(context.getArenaId());
+        if (state == null || state.isEnded()) {
+            return;
+        }
+
+        VoidFallAction action = resolveVoidFallAction(context, state, player);
+        if (action == VoidFallAction.ELIMINATE) {
+            handleDamage(context, state, player, null);
+            broadcastOutOfBoundsMessage(context, player, deathBlock);
+            return;
+        }
+
         Location deathLocation = resolvePlayerLocation(player);
         playVisualEffects(player, null, deathLocation);
         context.respawnPlayer(player);
         loadoutService.applyStartingEffects(player, "effects.respawn_effects");
+        broadcastOutOfBoundsMessage(context, player, deathBlock);
+    }
 
-        String path = deathBlock ? "messages.deaths.death_block" : "messages.deaths.void";
-        String message = messagingService.getRandomMessage(path);
-        if (message != null) {
-            message = message.replace("{player}", player.getDisplayName());
-            for (Player target : context.getPlayers()) {
-                context.getMessagesAPI().sendRaw(target, message);
-            }
+    private VoidFallAction resolveVoidFallAction(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
+                                                 RunFromTheBeastArenaState state,
+                                                 Player player) {
+        String path = isBeast(context, state, player) ? "game.void_fall.beast_action" : "game.void_fall.runners_action";
+        String value = moduleConfig.getString(path, VoidFallAction.RESPAWN.name());
+
+        if (value == null || value.isBlank()) {
+            return VoidFallAction.RESPAWN;
+        }
+
+        try {
+            return VoidFallAction.valueOf(value.trim().toUpperCase());
+        } catch (IllegalArgumentException ignored) {
+            return VoidFallAction.RESPAWN;
         }
     }
 
-    public void handleDamage(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    private void broadcastOutOfBoundsMessage(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
+                                             Player player,
+                                             boolean deathBlock) {
+        String path = deathBlock ? "messages.deaths.death_block" : "messages.deaths.void";
+        String message = messagingService.getRandomMessage(path);
+        if (message == null) {
+            return;
+        }
+
+        message = message.replace("{player}", player.getDisplayName());
+        for (Player target : context.getPlayers()) {
+            context.getMessagesAPI().sendRaw(target, message);
+        }
+    }
+
+    public void handleDamage(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                              RunFromTheBeastArenaState state,
                              Player victim,
                              Player killer) {
         if (state == null || state.isEnded()) {
+            return;
+        }
+
+        // Don't process damage for spectators
+        if (context.getSpectators().contains(victim)) {
             return;
         }
 
@@ -256,6 +297,11 @@ public class RunFromTheBeastGameManager {
         }
     }
 
+    private enum VoidFallAction {
+        RESPAWN,
+        ELIMINATE
+    }
+
     private void playVisualEffects(Player victim, Player killer, Location deathLocation) {
         VisualEffectsAPI visualEffectsAPI = ModuleAPI.getVisualEffectsAPI();
         if (visualEffectsAPI == null) {
@@ -271,18 +317,18 @@ public class RunFromTheBeastGameManager {
         }
     }
 
-    public boolean isBeast(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    public boolean isBeast(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                            RunFromTheBeastArenaState state,
                            Player player) {
         return state != null && state.getBeastId() != null && state.getBeastId().equals(player.getUuid());
     }
 
-    private void applyEliminatedState(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    private void applyEliminatedState(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                       Player player) {
         updateSpectatorVisibility(context, player, true);
     }
 
-    private void restoreVisibility(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context) {
+    private void restoreVisibility(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context) {
         if (context == null) {
             return;
         }
@@ -291,7 +337,7 @@ public class RunFromTheBeastGameManager {
         }
     }
 
-    private void updateSpectatorVisibility(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    private void updateSpectatorVisibility(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                            Player spectator,
                                            boolean hidden) {
         if (context == null || spectator == null) {
@@ -318,7 +364,7 @@ public class RunFromTheBeastGameManager {
         }
     }
 
-    private void preparePlayers(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    private void preparePlayers(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                 RunFromTheBeastArenaState state) {
         for (Player player : context.getPlayers()) {
             loadoutService.clearInventory(player);
@@ -352,7 +398,7 @@ public class RunFromTheBeastGameManager {
         }
     }
 
-    private void startReleaseCountdown(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    private void startReleaseCountdown(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                        RunFromTheBeastArenaState state) {
         int arenaId = context.getArenaId();
         String taskId = "arena_" + arenaId + "_rftb_release";
@@ -381,7 +427,7 @@ public class RunFromTheBeastGameManager {
         }, 0L, 20L);
     }
 
-    private void releaseBeast(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    private void releaseBeast(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                               RunFromTheBeastArenaState state) {
         Player beast = getBeast(context, state);
         if (beast != null) {
@@ -397,7 +443,7 @@ public class RunFromTheBeastGameManager {
         cageService.clearCage(context, state);
     }
 
-    private void startGameTimer(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    private void startGameTimer(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                 RunFromTheBeastArenaState state) {
         int arenaId = context.getArenaId();
 
@@ -448,7 +494,7 @@ public class RunFromTheBeastGameManager {
         }, 0L, 20L);
     }
 
-    private void startDistanceTracking(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    private void startDistanceTracking(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                        RunFromTheBeastArenaState state) {
         boolean enabled = moduleConfig.getBoolean("distance_bar.enabled", true);
         if (!enabled) {
@@ -468,7 +514,7 @@ public class RunFromTheBeastGameManager {
         }, 0L, interval);
     }
 
-    private void handleRunnerVictory(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    private void handleRunnerVictory(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                      RunFromTheBeastArenaState state,
                                      List<Player> runners) {
         for (Player runner : runners) {
@@ -499,7 +545,7 @@ public class RunFromTheBeastGameManager {
         context.endGame();
     }
 
-    private void handleBeastVictory(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    private void handleBeastVictory(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                     RunFromTheBeastArenaState state,
                                     Player beast) {
         if (beast != null) {
@@ -540,39 +586,63 @@ public class RunFromTheBeastGameManager {
         return notifications.contains(seconds);
     }
 
-    private int getGameTime(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context) {
+    private int getGameTime(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context) {
         Integer gameTime = context.getDataAccess().getGameData("basic.time", Integer.class);
         return (gameTime != null && gameTime > 0) ? gameTime : 240;
     }
 
-    private void startMovementTracking(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context,
+    private void startMovementTracking(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
                                        RunFromTheBeastArenaState state) {
         int arenaId = context.getArenaId();
         String taskId = "arena_" + arenaId + "_rftb_movement";
-        context.getSchedulerAPI().runTimer(taskId, () -> {
+        Runnable tickTask = () -> {
             if (state.isEnded()) {
                 context.getSchedulerAPI().cancelTask(taskId);
                 return;
             }
             handleMovementTick(context);
-        }, 0L, 5L);
+        };
+        Location worldLocation = context.getArenaAPI().getRandomSpawn();
+        if (worldLocation == null) {
+            worldLocation = context.getArenaAPI().getBoundsMin();
+        }
+        if (worldLocation != null) {
+            context.getSchedulerAPI().runTimer(taskId, tickTask, 0L, 5L);
+        } else {
+            context.getSchedulerAPI().runTimer(taskId, tickTask, 0L, 5L);
+        }
     }
 
-    private void handleMovementTick(GameContext<Player, Location, World, String, ItemStack, String, BlockState, Entity> context) {
+    private void handleMovementTick(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context) {
         for (Player player : context.getPlayers()) {
             if (player == null || !context.isPlayerPlaying(player)) {
                 continue;
             }
+            handleMovementTickForPlayer(context, player);
+        }
+    }
 
+    private void handleMovementTickForPlayer(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,
+                                             Player player) {
+        if (!context.isPlayerPlaying(player)) {
+            return;
+        }
+        World world = player.getWorld();
+        if (world == null) {
+            return;
+        }
+        world.execute(() -> {
+            if (!context.isPlayerPlaying(player)) {
+                return;
+            }
             Location location = resolvePlayerLocation(player);
             if (location == null) {
-                continue;
+                return;
             }
-
             if (!context.isInsideBounds(location) && context.getPhase() == GamePhase.PLAYING) {
                 handleOutOfBounds(context, player, false);
             }
-        }
+        });
     }
 
     private Location resolvePlayerLocation(Player player) {
