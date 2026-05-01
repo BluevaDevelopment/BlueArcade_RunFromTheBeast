@@ -60,6 +60,7 @@ public class RunFromTheBeastCageService {
 
     private void clearSavedCageBlocks(GameContext<Player, Location, World, Material, ItemStack, Sound, Block, Entity> context,
                                       List<String> blockData) {
+        World fallbackWorld = context.getArenaAPI() != null ? context.getArenaAPI().getWorld() : null;
         for (String entry : blockData) {
             String[] parts = entry.split(",");
             if (parts.length != 5 && parts.length != 8) {
@@ -67,6 +68,9 @@ public class RunFromTheBeastCageService {
             }
 
             World world = Bukkit.getWorld(parts[0]);
+            if (world == null) {
+                world = fallbackWorld;
+            }
             if (world == null) {
                 continue;
             }
@@ -102,6 +106,7 @@ public class RunFromTheBeastCageService {
 
     private void applySavedCageBlocks(GameContext<Player, Location, World, Material, ItemStack, Sound, Block, Entity> context,
                                       List<String> blockData) {
+        World fallbackWorld = context.getArenaAPI() != null ? context.getArenaAPI().getWorld() : null;
         for (String entry : blockData) {
             String[] parts = entry.split(",");
             if (parts.length != 8) {
@@ -109,6 +114,9 @@ public class RunFromTheBeastCageService {
             }
 
             World world = Bukkit.getWorld(parts[0]);
+            if (world == null) {
+                world = fallbackWorld;
+            }
             if (world == null) {
                 continue;
             }
