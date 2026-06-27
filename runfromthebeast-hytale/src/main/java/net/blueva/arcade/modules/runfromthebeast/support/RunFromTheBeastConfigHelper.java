@@ -51,7 +51,7 @@ public class RunFromTheBeastConfigHelper {
             return "-";
         }
         return players.stream()
-                .map(Player::getDisplayName)
+                .map(player -> player.getPlayerRef().getUsername())
                 .collect(Collectors.joining(", "));
     }
 }

@@ -30,7 +30,7 @@ public class RunFromTheBeastRewardService {
             return;
         }
 
-        String beastName = beast != null ? beast.getDisplayName() : "-";
+        String beastName = beast != null ? beast.getPlayerRef().getUsername() : "-";
 
         List<String> beastRewards = moduleConfig.getStringListFrom("rewards.yml", "rewards.beast_win");
         List<String> runnerRewards = moduleConfig.getStringListFrom("rewards.yml", "rewards.runners_win");
@@ -53,7 +53,7 @@ public class RunFromTheBeastRewardService {
         for (Player target : targets) {
             for (String command : commands) {
                 String processed = command
-                        .replace("{player}", target.getDisplayName())
+                        .replace("{player}", target.getPlayerRef().getUsername())
                         .replace("{team}", role)
                         .replace("{beast}", beastName != null ? beastName : "-");
                 CommandManager.get().handleCommand(ConsoleSender.INSTANCE, processed);

@@ -7,8 +7,12 @@ import net.blueva.arcade.api.setup.TabCompleteContext;
 import net.blueva.arcade.api.setup.TabCompleteResult;
 import net.blueva.arcade.modules.runfromthebeast.RunFromTheBeastModule;
 import com.hypixel.hytale.math.vector.Location;
-import com.hypixel.hytale.math.vector.Vector3d;
-import com.hypixel.hytale.math.vector.Vector3f;
+import com.hypixel.hytale.math.vector.Rotation3f;
+import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
+import org.joml.Vector3d;
 import com.hypixel.hytale.server.core.command.system.CommandSender;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 
@@ -188,11 +192,17 @@ public class RunFromTheBeastSetup implements GameSetupHandler {
     }
 
     private Location resolvePlayerLocation(Player player) {
-        if (player == null || player.getWorld() == null || player.getTransformComponent() == null) {
+        if (player == null || player.getWorld() == null || player.getReference() == null) {
             return null;
         }
-        Vector3d position = player.getTransformComponent().getPosition();
-        Vector3f rotation = player.getTransformComponent().getRotation();
+        Ref<EntityStore> ref = player.getReference();
+        Store<EntityStore> store = ref.getStore();
+        TransformComponent transform = store.getComponent(ref, TransformComponent.getComponentType());
+        if (transform == null) {
+            return null;
+        }
+        Vector3d position = transform.getPosition();
+        Rotation3f rotation = transform.getRotation();
         return new Location(player.getWorld().getName(), position, rotation);
     }
 

@@ -34,7 +34,7 @@ import net.blueva.arcade.modules.runfromthebeast.support.RunFromTheBeastRewardSe
 import net.blueva.arcade.modules.runfromthebeast.support.RunFromTheBeastStatsService;
 import net.blueva.arcade.modules.runfromthebeast.support.RunFromTheBeastStoreService;
 import com.hypixel.hytale.math.vector.Location;
-import com.hypixel.hytale.math.vector.Vector3i;
+import org.joml.Vector3i;
 import com.hypixel.hytale.server.core.entity.Entity;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;

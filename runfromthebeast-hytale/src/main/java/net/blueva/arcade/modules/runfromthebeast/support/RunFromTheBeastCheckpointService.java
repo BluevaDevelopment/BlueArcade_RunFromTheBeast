@@ -4,9 +4,13 @@ import net.blueva.arcade.api.config.ModuleConfigAPI;
 import net.blueva.arcade.api.game.GameContext;
 import net.blueva.arcade.modules.runfromthebeast.state.RunFromTheBeastArenaState;
 import com.hypixel.hytale.math.vector.Location;
-import com.hypixel.hytale.math.vector.Vector3d;
-import com.hypixel.hytale.math.vector.Vector3f;
+import com.hypixel.hytale.math.vector.Rotation3f;
 import com.hypixel.hytale.server.core.entity.Entity;
+import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
+import org.joml.Vector3d;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.Inventory;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
@@ -86,9 +90,19 @@ public class RunFromTheBeastCheckpointService {
         }
 
         context.getSchedulerAPI().runAtEntity(player, () -> {
-            if (player.getTransformComponent() != null) {
-                player.getTransformComponent().teleportPosition(checkpoint.getPosition());
-                player.getTransformComponent().teleportRotation(checkpoint.getRotation());
+            if (player.getReference() == null) {
+                return;
+            }
+            Ref<EntityStore> ref = player.getReference();
+            Store<EntityStore> store = ref.getStore();
+            TransformComponent transform = store.getComponent(ref, TransformComponent.getComponentType());
+            if (transform == null) {
+                return;
+            }
+            transform.setPosition(checkpoint.getPosition());
+            Rotation3f rotation = checkpoint.getRotation();
+            if (rotation != null) {
+                transform.setRotation(rotation);
             }
         });
         context.getMessagesAPI().sendRaw(player, moduleConfig.getStringFrom("language.yml", "messages.checkpoint.teleported"));
@@ -114,11 +128,17 @@ public class RunFromTheBeastCheckpointService {
     }
 
     private Location resolvePlayerLocation(Player player) {
-        if (player == null || player.getWorld() == null || player.getTransformComponent() == null) {
+        if (player == null || player.getWorld() == null || player.getReference() == null) {
             return null;
         }
-        Vector3d position = player.getTransformComponent().getPosition();
-        Vector3f rotation = player.getTransformComponent().getRotation();
+        Ref<EntityStore> ref = player.getReference();
+        Store<EntityStore> store = ref.getStore();
+        TransformComponent transform = store.getComponent(ref, TransformComponent.getComponentType());
+        if (transform == null) {
+            return null;
+        }
+        Vector3d position = transform.getPosition();
+        Rotation3f rotation = transform.getRotation();
         return new Location(player.getWorld().getName(), position, rotation);
     }
 }

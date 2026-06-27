@@ -2,7 +2,7 @@ package net.blueva.arcade.modules.runfromthebeast.support;
 
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.math.vector.Transform;
-import com.hypixel.hytale.math.vector.Vector3f;
+import com.hypixel.hytale.math.vector.Rotation3f;
 import com.hypixel.hytale.server.core.modules.entity.teleport.Teleport;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import net.blueva.arcade.api.config.ModuleConfigAPI;
@@ -116,10 +116,10 @@ public class RunFromTheBeastBeastService {
         }
     }
 
-    private Vector3f resolveRotation(Location location) {
+    private Rotation3f resolveRotation(Location location) {
         if (location.getRotation() != null) {
             return location.getRotation();
         }
-        return new Vector3f(0.0f, 0.0f, 0.0f);
+        return new Rotation3f(0.0f, 0.0f, 0.0f);
     }
 }

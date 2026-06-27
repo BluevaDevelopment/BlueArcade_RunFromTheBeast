@@ -21,10 +21,14 @@ import net.blueva.arcade.modules.runfromthebeast.support.RunFromTheBeastMessagin
 import net.blueva.arcade.modules.runfromthebeast.support.RunFromTheBeastRewardService;
 import net.blueva.arcade.modules.runfromthebeast.support.RunFromTheBeastStatsService;
 import com.hypixel.hytale.math.vector.Location;
-import com.hypixel.hytale.math.vector.Vector3i;
-import com.hypixel.hytale.math.vector.Vector3d;
-import com.hypixel.hytale.math.vector.Vector3f;
+import com.hypixel.hytale.math.vector.Rotation3f;
 import com.hypixel.hytale.server.core.entity.Entity;
+import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
+import org.joml.Vector3d;
+import org.joml.Vector3i;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.HiddenPlayersManager;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
@@ -244,7 +248,7 @@ public class RunFromTheBeastGameManager {
             return;
         }
 
-        message = message.replace("{player}", player.getDisplayName());
+        message = message.replace("{player}", player.getPlayerRef().getUsername());
         for (Player target : context.getPlayers()) {
             context.getMessagesAPI().sendRaw(target, message);
         }
@@ -523,7 +527,7 @@ public class RunFromTheBeastGameManager {
 
         Player beast = getBeast(context, state);
         Map<String, String> placeholders = new HashMap<>();
-        placeholders.put("beast", beast != null ? beast.getDisplayName() : "-");
+        placeholders.put("beast", beast != null ? beast.getPlayerRef().getUsername() : "-");
         placeholders.put("runner_count", String.valueOf(runners.size()));
         placeholders.put("runners", configHelper.formatPlayerList(runners));
 
@@ -554,13 +558,13 @@ public class RunFromTheBeastGameManager {
 
         List<Player> runners = getAliveRunners(context, state);
         Map<String, String> placeholders = new HashMap<>();
-        placeholders.put("beast", beast != null ? beast.getDisplayName() : "-");
+        placeholders.put("beast", beast != null ? beast.getPlayerRef().getUsername() : "-");
         placeholders.put("runner_count", String.valueOf(runners.size()));
         placeholders.put("runners", configHelper.formatPlayerList(runners));
 
         messagingService.sendOutcomeMessage(context, "messages.beast_win_lines",
                 moduleConfig.getStringFrom("language.yml", "messages.beast_wins")
-                        .replace("{beast}", beast != null ? beast.getDisplayName() : "-"),
+                        .replace("{beast}", beast != null ? beast.getPlayerRef().getUsername() : "-"),
                 placeholders);
         messagingService.sendVictoryTitles(context, "titles.victory.beast_won", placeholders);
         messagingService.showFinalScoreboard(context, "scoreboard.final.beast_won", placeholders);
@@ -646,11 +650,17 @@ public class RunFromTheBeastGameManager {
     }
 
     private Location resolvePlayerLocation(Player player) {
-        if (player == null || player.getWorld() == null || player.getTransformComponent() == null) {
+        if (player == null || player.getWorld() == null || player.getReference() == null) {
             return null;
         }
-        Vector3d position = player.getTransformComponent().getPosition();
-        Vector3f rotation = player.getTransformComponent().getRotation();
+        Ref<EntityStore> ref = player.getReference();
+        Store<EntityStore> store = ref.getStore();
+        TransformComponent transform = store.getComponent(ref, TransformComponent.getComponentType());
+        if (transform == null) {
+            return null;
+        }
+        Vector3d position = transform.getPosition();
+        Rotation3f rotation = transform.getRotation();
         return new Location(player.getWorld().getName(), position, rotation);
     }
 }

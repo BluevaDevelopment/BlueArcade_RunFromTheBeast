@@ -11,7 +11,7 @@ import com.hypixel.hytale.component.dependency.RootDependency;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.EntityEventSystem;
 import com.hypixel.hytale.math.vector.Location;
-import com.hypixel.hytale.math.vector.Vector3i;
+import org.joml.Vector3i;
 import com.hypixel.hytale.server.core.entity.Entity;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.event.events.ecs.UseBlockEvent;
@@ -75,7 +75,7 @@ public class RunFromTheBeastChestSystem extends EntityEventSystem<EntityStore, U
         }
 
         // Check if this is a chest
-        String blockId = world.getBlockType(targetBlock.getX(), targetBlock.getY(), targetBlock.getZ()).getId();
+        String blockId = world.getBlockType(targetBlock.x, targetBlock.y, targetBlock.z).getId();
         if (blockId == null || blockId.isBlank()) {
             return;
         }

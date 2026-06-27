@@ -92,7 +92,7 @@ public class RunFromTheBeastMessagingService {
                                                        Player player,
                                                        Player beast, int runnersAlive) {
         Map<String, String> placeholders = new HashMap<>();
-        placeholders.put("beast", beast != null ? beast.getDisplayName() : "-");
+        placeholders.put("beast", beast != null ? beast.getPlayerRef().getUsername() : "-");
         placeholders.put("runners_alive", String.valueOf(runnersAlive));
         placeholders.put("release_time", String.valueOf(Math.max(state.getReleaseTimeSeconds(), 0)));
         placeholders.put("checkpoint_uses", String.valueOf(state.getCheckpointUses().getOrDefault(player.getUuid(), 0)));
@@ -186,8 +186,8 @@ public class RunFromTheBeastMessagingService {
             return;
         }
 
-        message = message.replace("{victim}", victim.getDisplayName())
-                .replace("{beast}", beast.getDisplayName());
+        message = message.replace("{victim}", victim.getPlayerRef().getUsername())
+                .replace("{beast}", beast.getPlayerRef().getUsername());
 
         for (Player target : context.getPlayers()) {
             context.getMessagesAPI().sendRaw(target, message);
