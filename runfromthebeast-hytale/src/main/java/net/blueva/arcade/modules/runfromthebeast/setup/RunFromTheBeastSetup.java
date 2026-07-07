@@ -35,7 +35,7 @@ public class RunFromTheBeastSetup implements GameSetupHandler {
     private boolean handleInternal(SetupContext<Player, CommandSender, Location> context) {
         if (!context.hasHandlerArgs(1)) {
             context.getMessagesAPI().sendRaw(context.getPlayer(),
-                    module.moduleConfig.getStringFrom("language.yml", "setup_messages.usage"));
+                    module.moduleConfig.getTranslation(context.getPlayer(), "setup_messages.usage"));
             return true;
         }
 
@@ -46,7 +46,7 @@ public class RunFromTheBeastSetup implements GameSetupHandler {
             case "beastzone" -> handleBeastZone(context);
             default -> {
                 context.getMessagesAPI().sendRaw(context.getPlayer(),
-                        module.coreConfig.getLanguage("admin_commands.errors.unknown_subcommand"));
+                        module.coreConfig.getLanguage(context.getPlayer(), "admin_commands.errors.unknown_subcommand"));
                 yield true;
             }
         };
@@ -91,7 +91,7 @@ public class RunFromTheBeastSetup implements GameSetupHandler {
         if (!hasBeastSpawn || !hasCage) {
             if (context.getSender() != null && context.isPlayer()) {
                 context.getMessagesAPI().sendRaw(context.getPlayer(),
-                        module.moduleConfig.getStringFrom("language.yml", "setup_messages.not_configured")
+                        module.moduleConfig.getTranslation(context.getPlayer(), "setup_messages.not_configured")
                                 .replace("{arena_id}", String.valueOf(context.getArenaId())));
             }
         }
@@ -106,21 +106,21 @@ public class RunFromTheBeastSetup implements GameSetupHandler {
 
         if (!context.hasHandlerArgs(1) || !"set".equalsIgnoreCase(context.getHandlerArg(0))) {
             context.getMessagesAPI().sendRaw(context.getPlayer(),
-                    module.moduleConfig.getStringFrom("language.yml", "setup_messages.usage_beast_spawn"));
+                    module.moduleConfig.getTranslation(context.getPlayer(), "setup_messages.usage_beast_spawn"));
             return true;
         }
 
         Player player = context.getPlayer();
         if (player == null || player.getWorld() == null) {
             context.getMessagesAPI().sendRaw(player,
-                module.coreConfig.getLanguage("admin_commands.errors.player_world_unavailable"));
+                module.coreConfig.getLanguage(context.getPlayer(), "admin_commands.errors.player_world_unavailable"));
             return true;
         }
         player.getWorld().execute(() -> {
             Location location = resolvePlayerLocation(player);
             if (location == null) {
             context.getMessagesAPI().sendRaw(player,
-                module.coreConfig.getLanguage("admin_commands.errors.player_unavailable"));
+                module.coreConfig.getLanguage(context.getPlayer(), "admin_commands.errors.player_unavailable"));
             return;
             }
 
@@ -128,7 +128,7 @@ public class RunFromTheBeastSetup implements GameSetupHandler {
             context.getData().save();
 
             context.getMessagesAPI().sendRaw(player,
-                module.moduleConfig.getStringFrom("language.yml", "setup_messages.beast_spawn_set"));
+                module.moduleConfig.getTranslation(context.getPlayer(), "setup_messages.beast_spawn_set"));
         });
         return true;
     }
@@ -140,7 +140,7 @@ public class RunFromTheBeastSetup implements GameSetupHandler {
 
         if (!context.hasHandlerArgs(1) || !"set".equalsIgnoreCase(context.getHandlerArg(0))) {
             context.getMessagesAPI().sendRaw(context.getPlayer(),
-                    module.moduleConfig.getStringFrom("language.yml", "setup_messages.usage_beast_zone"));
+                    module.moduleConfig.getTranslation(context.getPlayer(), "setup_messages.usage_beast_zone"));
             return true;
         }
 
@@ -148,7 +148,7 @@ public class RunFromTheBeastSetup implements GameSetupHandler {
 
         if (!context.getSelection().hasCompleteSelection(player)) {
             context.getMessagesAPI().sendRaw(player,
-                    module.moduleConfig.getStringFrom("language.yml", "setup_messages.must_use_stick"));
+                    module.moduleConfig.getTranslation(context.getPlayer(), "setup_messages.must_use_stick"));
             return true;
         }
 
@@ -166,7 +166,7 @@ public class RunFromTheBeastSetup implements GameSetupHandler {
     private boolean requirePlayer(SetupContext<Player, CommandSender, Location> context) {
         if (!context.isPlayer()) {
             context.getMessagesAPI().sendRaw(context.getPlayer(),
-                    module.coreConfig.getLanguage("admin_commands.errors.must_be_player"));
+                    module.coreConfig.getLanguage(context.getPlayer(), "admin_commands.errors.must_be_player"));
             return false;
         }
         return true;
@@ -184,7 +184,7 @@ public class RunFromTheBeastSetup implements GameSetupHandler {
         int blocks = x * y * z;
 
         context.getMessagesAPI().sendRaw(context.getPlayer(),
-                module.moduleConfig.getStringFrom("language.yml", messagePath)
+                module.moduleConfig.getTranslation(context.getPlayer(), messagePath)
                         .replace("{blocks}", String.valueOf(blocks))
                         .replace("{x}", String.valueOf(x))
                         .replace("{y}", String.valueOf(y))

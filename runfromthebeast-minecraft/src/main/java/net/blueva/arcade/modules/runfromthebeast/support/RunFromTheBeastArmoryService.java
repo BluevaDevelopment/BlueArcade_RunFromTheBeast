@@ -31,7 +31,7 @@ public class RunFromTheBeastArmoryService {
                            org.bukkit.block.Container container) {
         boolean allowBeast = moduleConfig.getBoolean("game.allow_beast_loot", true);
         if (state != null && state.getBeastId() != null && player.getUniqueId().equals(state.getBeastId()) && !allowBeast) {
-            context.getMessagesAPI().sendRaw(player, moduleConfig.getStringFrom("language.yml", "messages.armory_beast_blocked"));
+            context.getMessagesAPI().sendRaw(player, moduleConfig.getTranslation(player, "messages.armory_beast_blocked"));
             return;
         }
 
@@ -63,7 +63,7 @@ public class RunFromTheBeastArmoryService {
         }
 
         String title = context.getItemAPI().formatInventoryTitle(
-                moduleConfig.getStringFrom("language.yml", "menus.armory.title"));
+                moduleConfig.getTranslation(player, "menus.armory.title"));
         org.bukkit.inventory.Inventory menu = player.getServer().createInventory(null, menuSize, title);
 
         for (int i = 0; i < Math.min(menu.getSize(), items.size()); i++) {

@@ -1,7 +1,13 @@
+#  ____  _               _                      _
+# | __ )| |_   _  ___   / \   _ __ ___ __ _  __| | ___
+# |  _ \| | | | |/ _ \ / _ \ | '__/ __/ _` |/ _` |/ _ \
+# | |_) | | |_| |  __// ___ \| | | (_| (_| | (_| |  __/
+# |____/|_|\__,_|\___/_/   \_|_|  \___\__,_|\__,_|\___|
+#
+# [!] Arcade by Blueva | https://blueva.net/store/blue-arcade [!]
+
 # Run From The Beast - English (UK)
 # Only Run From The Beast-specific content
-
-file_version: 2
 display_name: "Run From The Beast"
 
 description:
@@ -73,13 +79,13 @@ messages:
   eliminated: "<red>You were slain! You are now a spectator.</red>"
   deaths:
     killed_by_beast:
-      - "<dark_red>X</dark_red> <red>{victim}</red> <gray>was shredded by</gray> <yellow>{beast}</yellow><gray>.</gray>"
-      - "<dark_red>X</dark_red> <yellow>{beast}</yellow> <gray>claimed</gray> <red>{victim}</red><gray>.</gray>"
-      - "<dark_red>X</dark_red> <red>{victim}</red> <gray>could not escape</gray> <yellow>{beast}</yellow><gray>.</gray>"
+      - "<dark_red>✘</dark_red> <red>{victim}</red> <gray>was shredded by</gray> <yellow>{beast}</yellow><gray>.</gray>"
+      - "<dark_red>✘</dark_red> <yellow>{beast}</yellow> <gray>claimed</gray> <red>{victim}</red><gray>.</gray>"
+      - "<dark_red>✘</dark_red> <red>{victim}</red> <gray>could not escape</gray> <yellow>{beast}</yellow><gray>.</gray>"
     death_block:
-      - "<dark_red>X</dark_red> <red>{player}</red> <gray>triggered a death block.</gray>"
+      - "<dark_red>✘</dark_red> <red>{player}</red> <gray>triggered a death block.</gray>"
     void:
-      - "<dark_red>X</dark_red> <red>{player}</red> <gray>fell into the void.</gray>"
+      - "<dark_red>✘</dark_red> <red>{player}</red> <gray>fell into the void.</gray>"
 
 scoreboard:
   game:
@@ -122,9 +128,6 @@ titles:
   beast:
     title: "<red><bold>YOU ARE THE BEAST</bold></red>"
     subtitle: "<yellow>Hunt every runner down.</yellow>"
-  eliminated:
-    title: "<red><bold>ELIMINATED</bold></red>"
-    subtitle: "<gray>You are now spectating.</gray>"
   victory:
     beast_won:
       title: "<bold><gradient:red:dark_red>THE BEAST WON</gradient><reset>"
@@ -139,5 +142,5 @@ setup_messages:
   usage_beast_zone: "{prefix} <yellow>Usage: /baa game [arena_id] run_from_the_beast beastzone set</yellow>"
   must_use_stick: "{prefix} <red>Use the Magic Stick to select the area first.</red>"
   not_configured: "{prefix} <red>Run From The Beast still needs a beast spawn and beast zone in arena {arena_id}.</red>"
-  beast_zone_set: "{prefix} <green>Beast zone saved: {blocks} blocks ({x}x{y}x{z})</green>"
+  beast_zone_set: "{prefix} <green>Beast zone saved: {blocks} blocks ({x}×{y}×{z})</green>"
   beast_spawn_set: "{prefix} <green>Beast spawn point set.</green>"

@@ -1,10 +1,17 @@
-file_version: 1
+#  ____  _               _                      _
+# | __ )| |_   _  ___   / \   _ __ ___ __ _  __| | ___
+# |  _ \| | | | |/ _ \ / _ \ | '__/ __/ _` |/ _` |/ _ \
+# | |_) | | |_| |  __// ___ \| | | (_| (_| | (_| |  __/
+# |____/|_|\__,_|\___/_/   \_|_|  \___\__,_|\__,_|\___|
+#
+# [!] Arcade by Blueva | https://blueva.net/store/blue-arcade [!]
+
 category:
-  id: run_from_the_beast
+  id: "run_from_the_beast"
   name: "Run From The Beast"
   description:
     - "Achievements tied to Run From The Beast."
-  icon: DRAGON_HEAD
+  icon: "DRAGON_HEAD"
   sort_order: 20
 
 achievements:
@@ -12,7 +19,7 @@ achievements:
     name: "First Hunt"
     description:
       - "Win your first battle against the Beast."
-    icon: FEATHER
+    icon: "FEATHER"
     phases:
       1:
         name: "Opening Strike"
@@ -26,12 +33,12 @@ achievements:
             - "arcadeadmin xp give {player} 10"
           messages:
             - "  <gold>⛁</gold> <yellow>+10 credits</yellow>"
-            - "  <purple>✹</purple> <light_purple>+10 XP</light_purple>"
+            - "  <dark_purple>✹</dark_purple> <light_purple>+10 XP</light_purple>"
   beast_tamer:
     name: "Beast Tamer"
     description:
       - "Win as a runner by defeating the beast."
-    icon: DIAMOND_SWORD
+    icon: "DIAMOND_SWORD"
     phases:
       1:
         name: "Team Victory"
@@ -45,7 +52,7 @@ achievements:
             - "arcadeadmin xp give {player} 25"
           messages:
             - "  <gold>⛁</gold> <yellow>+25 credits</yellow>"
-            - "  <purple>✹</purple> <light_purple>+25 XP</light_purple>"
+            - "  <dark_purple>✹</dark_purple> <light_purple>+25 XP</light_purple>"
       2:
         name: "Beast Breaker"
         description:
@@ -58,12 +65,12 @@ achievements:
             - "arcadeadmin xp give {player} 60"
           messages:
             - "  <gold>⛁</gold> <yellow>+60 credits</yellow>"
-            - "  <purple>✹</purple> <light_purple>+60 XP</light_purple>"
+            - "  <dark_purple>✹</dark_purple> <light_purple>+60 XP</light_purple>"
   terror_reign:
     name: "Terror Reign"
     description:
       - "Win games as the beast."
-    icon: WITHER_SKELETON_SKULL
+    icon: "WITHER_SKELETON_SKULL"
     phases:
       1:
         name: "Predator"
@@ -77,7 +84,7 @@ achievements:
             - "arcadeadmin xp give {player} 25"
           messages:
             - "  <gold>⛁</gold> <yellow>+25 credits</yellow>"
-            - "  <purple>✹</purple> <light_purple>+25 XP</light_purple>"
+            - "  <dark_purple>✹</dark_purple> <light_purple>+25 XP</light_purple>"
       2:
         name: "Apex Beast"
         description:
@@ -90,12 +97,12 @@ achievements:
             - "arcadeadmin xp give {player} 70"
           messages:
             - "  <gold>⛁</gold> <yellow>+70 credits</yellow>"
-            - "  <purple>✹</purple> <light_purple>+70 XP</light_purple>"
+            - "  <dark_purple>✹</dark_purple> <light_purple>+70 XP</light_purple>"
   arena_runner:
     name: "Arena Runner"
     description:
       - "Keep playing Run From The Beast."
-    icon: RABBIT_FOOT
+    icon: "RABBIT_FOOT"
     phases:
       1:
         name: "Warm-up"
@@ -109,7 +116,7 @@ achievements:
             - "arcadeadmin xp give {player} 15"
           messages:
             - "  <gold>⛁</gold> <yellow>+15 credits</yellow>"
-            - "  <purple>✹</purple> <light_purple>+15 XP</light_purple>"
+            - "  <dark_purple>✹</dark_purple> <light_purple>+15 XP</light_purple>"
       2:
         name: "On the run"
         description:
@@ -122,4 +129,4 @@ achievements:
             - "arcadeadmin xp give {player} 40"
           messages:
             - "  <gold>⛁</gold> <yellow>+40 credits</yellow>"
-            - "  <purple>✹</purple> <light_purple>+40 XP</light_purple>"
+            - "  <dark_purple>✹</dark_purple> <light_purple>+40 XP</light_purple>"

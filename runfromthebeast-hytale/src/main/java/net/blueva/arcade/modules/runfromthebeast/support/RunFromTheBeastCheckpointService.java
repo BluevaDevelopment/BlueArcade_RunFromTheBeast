@@ -43,11 +43,11 @@ public class RunFromTheBeastCheckpointService {
         String returnItemId = configHelper.getItemIdSafe(back, "Ability_Checkpoint_Return");
 
         addItem(player, decorateCheckpointItem(context, setItemId,
-                moduleConfig.getStringFrom("language.yml", "messages.checkpoint_items.set_name"),
-                moduleConfig.getStringListFrom("language.yml", "messages.checkpoint_items.set_lore")));
+                moduleConfig.getTranslation(player, "messages.checkpoint_items.set_name"),
+                moduleConfig.getTranslationList(player, "messages.checkpoint_items.set_lore")));
         addItem(player, decorateCheckpointItem(context, returnItemId,
-                moduleConfig.getStringFrom("language.yml", "messages.checkpoint_items.return_name"),
-                moduleConfig.getStringListFrom("language.yml", "messages.checkpoint_items.return_lore")));
+                moduleConfig.getTranslation(player, "messages.checkpoint_items.return_name"),
+                moduleConfig.getTranslationList(player, "messages.checkpoint_items.return_lore")));
     }
 
     public String getCheckpointSetItemId() {
@@ -63,19 +63,19 @@ public class RunFromTheBeastCheckpointService {
                                     RunFromTheBeastArenaState state) {
         int uses = state.getCheckpointUses().getOrDefault(player.getUuid(), 0);
         if (uses <= 0) {
-            context.getMessagesAPI().sendRaw(player, moduleConfig.getStringFrom("language.yml", "messages.checkpoint.no_uses"));
+            context.getMessagesAPI().sendRaw(player, moduleConfig.getTranslation(player, "messages.checkpoint.no_uses"));
             return;
         }
         context.getSchedulerAPI().runAtEntity(player, () -> {
             Location location = resolvePlayerLocation(player);
             if (location == null) {
-                context.getMessagesAPI().sendRaw(player, moduleConfig.getStringFrom("language.yml", "messages.checkpoint.none"));
+                context.getMessagesAPI().sendRaw(player, moduleConfig.getTranslation(player, "messages.checkpoint.none"));
                 return;
             }
 
             state.getCheckpoints().put(player.getUuid(), location);
             state.getCheckpointUses().put(player.getUuid(), uses - 1);
-            context.getMessagesAPI().sendRaw(player, moduleConfig.getStringFrom("language.yml", "messages.checkpoint.set")
+            context.getMessagesAPI().sendRaw(player, moduleConfig.getTranslation(player, "messages.checkpoint.set")
                     .replace("{uses}", String.valueOf(uses - 1)));
         });
     }
@@ -85,7 +85,7 @@ public class RunFromTheBeastCheckpointService {
                                        RunFromTheBeastArenaState state) {
         Location checkpoint = state.getCheckpoints().get(player.getUuid());
         if (checkpoint == null) {
-            context.getMessagesAPI().sendRaw(player, moduleConfig.getStringFrom("language.yml", "messages.checkpoint.none"));
+            context.getMessagesAPI().sendRaw(player, moduleConfig.getTranslation(player, "messages.checkpoint.none"));
             return;
         }
 
@@ -105,7 +105,7 @@ public class RunFromTheBeastCheckpointService {
                 transform.setRotation(rotation);
             }
         });
-        context.getMessagesAPI().sendRaw(player, moduleConfig.getStringFrom("language.yml", "messages.checkpoint.teleported"));
+        context.getMessagesAPI().sendRaw(player, moduleConfig.getTranslation(player, "messages.checkpoint.teleported"));
     }
 
     private ItemStack decorateCheckpointItem(GameContext<Player, Location, World, String, ItemStack, String, Holder, Entity> context,

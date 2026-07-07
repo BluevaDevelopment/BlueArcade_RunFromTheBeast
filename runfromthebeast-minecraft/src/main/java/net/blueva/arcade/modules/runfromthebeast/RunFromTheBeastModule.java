@@ -41,6 +41,11 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.Map;
+import net.blueva.arcade.api.setup.ModuleSetupCommand;
+import net.blueva.arcade.api.setup.ModuleSetupMetadata;
+import net.blueva.arcade.api.setup.ModuleSetupStep;
+import net.blueva.arcade.api.setup.ModuleSetupStatusCheck;
+import java.util.List;
 
 public class RunFromTheBeastModule implements GameModule<Player, Location, World, Material, ItemStack, Sound, Block, Entity, Listener, EventPriority> {
 
@@ -102,11 +107,10 @@ public class RunFromTheBeastModule implements GameModule<Player, Location, World
 
         statsService.registerStats();
 
-        moduleConfig.register("language.yml", 2);
-        moduleConfig.register("settings.yml", 2);
-        moduleConfig.register("achievements.yml", 1);
-        moduleConfig.register("store.yml", 1);
-        moduleConfig.register("rewards.yml", 1);
+        moduleConfig.register("settings.yml");
+        moduleConfig.register("achievements.yml");
+        moduleConfig.register("store.yml");
+        moduleConfig.register("rewards.yml");
 
         if (achievementsAPI != null) {
             achievementsAPI.registerModuleAchievements(moduleInfo.getId(), "achievements.yml");
@@ -120,8 +124,8 @@ public class RunFromTheBeastModule implements GameModule<Player, Location, World
             voteMenu.registerGame(
                     moduleInfo.getId(),
                     Material.valueOf(moduleConfig.getString("menus.vote.item")),
-                    moduleConfig.getStringFrom("language.yml", "vote_menu.name"),
-                    moduleConfig.getStringListFrom("language.yml", "vote_menu.lore")
+                    moduleConfig.getTranslation(null, "vote_menu.name"),
+                    moduleConfig.getTranslationList(null, "vote_menu.lore")
             );
         }
     }
@@ -247,4 +251,35 @@ public class RunFromTheBeastModule implements GameModule<Player, Location, World
     public Material getCheckpointReturnMaterial() {
         return checkpointService.getCheckpointReturnMaterial();
     }
+
+    @Override
+    public ModuleSetupMetadata getSetupMetadata() {
+        return new ModuleSetupMetadata() {
+
+            @Override
+            public List<ModuleSetupStep> getSetupSteps() {
+                return List.of(
+                        new ModuleSetupStep("beastspawn", true, "Configure Beastspawn", "Configure the module-specific beastspawn setup data.", List.of("/baa game <arena> run_from_the_beast beastspawn"), "beast spawn location"),
+                        new ModuleSetupStep("beastzone", true, "Configure Beastzone", "Configure the module-specific beastzone setup data.", List.of("/baa game <arena> run_from_the_beast beastzone"), "selection region")
+                );
+            }
+
+            @Override
+            public List<ModuleSetupCommand> getSetupCommands() {
+                return List.of(
+                        new ModuleSetupCommand("beastspawn", "/baa game <arena> run_from_the_beast beastspawn", "Configure beastspawn setup data.", true),
+                        new ModuleSetupCommand("beastzone", "/baa game <arena> run_from_the_beast beastzone", "Configure beastzone setup data.", true)
+                );
+            }
+
+            @Override
+            public List<ModuleSetupStatusCheck<?, ?, ?>> getStatusChecks() {
+                return List.of(
+                        new ModuleSetupStatusCheck<>("beastspawn", true, "Set the beast spawn location.", context -> context.getData().has("game.beast.spawn.x")),
+                        new ModuleSetupStatusCheck<>("beastzone", true, "Select the beast cage region.", context -> context.getData().has("game.beast_cage.bounds.min.x") && context.getData().has("game.beast_cage.bounds.max.x"))
+                );
+            }
+        };
+    }
+
 }

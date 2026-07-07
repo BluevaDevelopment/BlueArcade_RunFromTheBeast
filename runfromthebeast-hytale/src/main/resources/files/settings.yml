@@ -1,10 +1,16 @@
-# Run From The Beast - Settings
+#  ____  _               _                      _
+# | __ )| |_   _  ___   / \   _ __ ___ __ _  __| | ___
+# |  _ \| | | | |/ _ \ / _ \ | '__/ __/ _` |/ _` |/ _ \
+# | |_) | | |_| |  __// ___ \| | | (_| (_| | (_| |  __/
+# |____/|_|\__,_|\___/_/   \_|_|  \___\__,_|\__,_|\___|
+#
+# [!] Arcade by Blueva | https://blueva.net/store/blue-arcade [!]
 
-file_version: 2
+# Run From The Beast - Settings
 # Visual representation in menus
 menus:
   vote:
-    item: Weapon_Longsword_Iron
+    item: "Weapon_Longsword_Iron"
 
 game:
   # Seconds the beast stays locked before being released
@@ -12,18 +18,18 @@ game:
   # Configure what happens when someone falls into the void/out-of-bounds.
   # Available values: RESPAWN, ELIMINATE
   void_fall:
-    runners_action: RESPAWN
-    beast_action: RESPAWN
+    runners_action: "RESPAWN"
+    beast_action: "RESPAWN"
   # Allow the beast to open the shared armory chest/menu
   allow_beast_loot: true
   # Visual gear applied to the beast on start (set to AIR to skip a slot)
   beast_equipment:
     enabled: true
-    helmet: Armor_Iron_Head
-    chestplate: Armor_Iron_Chest
-    leggings: Armor_Iron_Legs
-    boots: Armor_Iron_Hands
-    main_hand: Weapon_Longsword_Iron
+    helmet: "Armor_Iron_Head"
+    chestplate: "Armor_Iron_Chest"
+    leggings: "Armor_Iron_Legs"
+    boots: "Armor_Iron_Hands"
+    main_hand: "Weapon_Longsword_Iron"
 
 distance_bar:
   enabled: true
@@ -51,8 +57,8 @@ effects:
 checkpoints:
   default_uses: 5
   items:
-    set: Ability_Checkpoint_Set
-    return: Ability_Checkpoint_Return
+    set: "Ability_Checkpoint_Set"
+    return: "Ability_Checkpoint_Return"
 
 armory:
   # Items available in armory chests (each player gets their own copy)

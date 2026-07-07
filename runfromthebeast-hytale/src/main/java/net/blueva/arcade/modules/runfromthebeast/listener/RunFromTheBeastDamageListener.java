@@ -63,6 +63,7 @@ public class RunFromTheBeastDamageListener extends EntityEventSystem<EntityStore
 
         Player attacker = resolveAttacker(damage);
         if (attacker == null) {
+            damage.setCancelled(true);
             return;
         }
 

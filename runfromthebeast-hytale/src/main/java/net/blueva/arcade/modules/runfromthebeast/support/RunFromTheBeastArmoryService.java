@@ -42,7 +42,7 @@ public class RunFromTheBeastArmoryService {
         boolean blockedBeast = state != null && state.getBeastId() != null
                 && player.getUuid().equals(state.getBeastId()) && !allowBeast;
         if (blockedBeast) {
-            context.getMessagesAPI().sendRaw(player, moduleConfig.getStringFrom("language.yml", "messages.armory_beast_blocked"));
+            context.getMessagesAPI().sendRaw(player, moduleConfig.getTranslation(player, "messages.armory_beast_blocked"));
             return;
         }
 

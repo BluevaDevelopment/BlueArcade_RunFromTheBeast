@@ -37,11 +37,11 @@ public class RunFromTheBeastCheckpointService {
         Material returnMaterial = configHelper.getMaterialSafe(back, Material.ENDER_EYE);
 
         player.getInventory().addItem(decorateCheckpointItem(context, setMaterial,
-                moduleConfig.getStringFrom("language.yml", "messages.checkpoint_items.set_name"),
-                moduleConfig.getStringListFrom("language.yml", "messages.checkpoint_items.set_lore")));
+                moduleConfig.getTranslation(player, "messages.checkpoint_items.set_name"),
+                moduleConfig.getTranslationList(player, "messages.checkpoint_items.set_lore")));
         player.getInventory().addItem(decorateCheckpointItem(context, returnMaterial,
-                moduleConfig.getStringFrom("language.yml", "messages.checkpoint_items.return_name"),
-                moduleConfig.getStringListFrom("language.yml", "messages.checkpoint_items.return_lore")));
+                moduleConfig.getTranslation(player, "messages.checkpoint_items.return_name"),
+                moduleConfig.getTranslationList(player, "messages.checkpoint_items.return_lore")));
     }
 
     public Material getCheckpointSetMaterial() {
@@ -57,13 +57,13 @@ public class RunFromTheBeastCheckpointService {
                                     RunFromTheBeastArenaState state) {
         int uses = state.getCheckpointUses().getOrDefault(player.getUniqueId(), 0);
         if (uses <= 0) {
-            context.getMessagesAPI().sendRaw(player, moduleConfig.getStringFrom("language.yml", "messages.checkpoint.no_uses"));
+            context.getMessagesAPI().sendRaw(player, moduleConfig.getTranslation(player, "messages.checkpoint.no_uses"));
             return;
         }
 
         state.getCheckpoints().put(player.getUniqueId(), player.getLocation());
         state.getCheckpointUses().put(player.getUniqueId(), uses - 1);
-        context.getMessagesAPI().sendRaw(player, moduleConfig.getStringFrom("language.yml", "messages.checkpoint.set")
+        context.getMessagesAPI().sendRaw(player, moduleConfig.getTranslation(player, "messages.checkpoint.set")
                 .replace("{uses}", String.valueOf(uses - 1)));
     }
 
@@ -72,13 +72,13 @@ public class RunFromTheBeastCheckpointService {
                                        RunFromTheBeastArenaState state) {
         Location checkpoint = state.getCheckpoints().get(player.getUniqueId());
         if (checkpoint == null) {
-            context.getMessagesAPI().sendRaw(player, moduleConfig.getStringFrom("language.yml", "messages.checkpoint.none"));
+            context.getMessagesAPI().sendRaw(player, moduleConfig.getTranslation(player, "messages.checkpoint.none"));
             return;
         }
 
         context.getSchedulerAPI().runLater("checkpoint_return_" + player.getUniqueId(),
                 () -> player.teleport(checkpoint), 0L);
-        context.getMessagesAPI().sendRaw(player, moduleConfig.getStringFrom("language.yml", "messages.checkpoint.teleported"));
+        context.getMessagesAPI().sendRaw(player, moduleConfig.getTranslation(player, "messages.checkpoint.teleported"));
     }
 
     private ItemStack decorateCheckpointItem(GameContext<Player, Location, World, Material, ItemStack, Sound, Block, Entity> context,

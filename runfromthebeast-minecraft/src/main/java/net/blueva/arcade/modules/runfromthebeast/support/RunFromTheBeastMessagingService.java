@@ -35,9 +35,8 @@ public class RunFromTheBeastMessagingService {
     }
 
     public void sendDescription(GameContext<Player, Location, World, Material, ItemStack, Sound, Block, Entity> context) {
-        List<String> description = moduleConfig.getStringListFrom("language.yml", "description");
-
         for (Player player : context.getPlayers()) {
+            List<String> description = moduleConfig.getTranslationList(player, "description");
             for (String line : description) {
                 context.getMessagesAPI().sendRaw(player, line);
             }
@@ -53,11 +52,11 @@ public class RunFromTheBeastMessagingService {
 
             context.getSoundsAPI().play(player, coreConfig.getSound("sounds.starting_game.countdown"));
 
-            String title = coreConfig.getLanguage("titles.starting_game.title")
+            String title = coreConfig.getLanguage(player, "titles.starting_game.title")
                     .replace("{game_display_name}", moduleInfo.getName())
                     .replace("{time}", String.valueOf(secondsLeft));
 
-            String subtitle = coreConfig.getLanguage("titles.starting_game.subtitle")
+            String subtitle = coreConfig.getLanguage(player, "titles.starting_game.subtitle")
                     .replace("{game_display_name}", moduleInfo.getName())
                     .replace("{time}", String.valueOf(secondsLeft));
 
@@ -71,10 +70,10 @@ public class RunFromTheBeastMessagingService {
                 continue;
             }
 
-            String title = coreConfig.getLanguage("titles.game_started.title")
+            String title = coreConfig.getLanguage(player, "titles.game_started.title")
                     .replace("{game_display_name}", moduleInfo.getName());
 
-            String subtitle = coreConfig.getLanguage("titles.game_started.subtitle")
+            String subtitle = coreConfig.getLanguage(player, "titles.game_started.subtitle")
                     .replace("{game_display_name}", moduleInfo.getName());
 
             context.getTitlesAPI().sendRaw(player, title, subtitle, 0, 20, 20);
@@ -91,9 +90,9 @@ public class RunFromTheBeastMessagingService {
             return;
         }
 
-        String template = coreConfig.getLanguage("action_bar.in_game.global");
+        String template = coreConfig.getLanguage(player, "action_bar.in_game.global");
         String formatted = template
-                .replace("{time}", String.valueOf(state.getTimeLeftSeconds()))
+                .replace("{time}", formatCountdownTime(state.getTimeLeftSeconds()))
                 .replace("{round}", String.valueOf(context.getCurrentRound()))
                 .replace("{round_max}", String.valueOf(context.getMaxRounds()));
 
@@ -110,14 +109,14 @@ public class RunFromTheBeastMessagingService {
         placeholders.put("runners_alive", String.valueOf(runnersAlive));
         placeholders.put("release_time", String.valueOf(Math.max(state.getReleaseTimeSeconds(), 0)));
         placeholders.put("checkpoint_uses", String.valueOf(state.getCheckpointUses().getOrDefault(player.getUniqueId(), 0)));
-        placeholders.put("time", String.valueOf(state.getTimeLeftSeconds()));
+        placeholders.put("time", formatCountdownTime(state.getTimeLeftSeconds()));
         return placeholders;
     }
 
     public void sendBeastTitle(GameContext<Player, Location, World, Material, ItemStack, Sound, Block, Entity> context,
                                Player beast) {
-        String title = moduleConfig.getStringFrom("language.yml", "titles.beast.title");
-        String subtitle = moduleConfig.getStringFrom("language.yml", "titles.beast.subtitle");
+        String title = moduleConfig.getTranslation(beast, "titles.beast.title");
+        String subtitle = moduleConfig.getTranslation(beast, "titles.beast.subtitle");
 
         if ((title == null || title.isEmpty()) && (subtitle == null || subtitle.isEmpty())) {
             return;
@@ -128,23 +127,21 @@ public class RunFromTheBeastMessagingService {
 
     public void sendOutcomeMessage(GameContext<Player, Location, World, Material, ItemStack, Sound, Block, Entity> context,
                                    String multilinePath,
-                                   String fallbackLine,
+                                   String fallbackPath,
                                    Map<String, String> placeholders) {
-        List<String> lines = moduleConfig.getStringListFrom("language.yml", multilinePath);
-        if (lines != null && !lines.isEmpty()) {
-            for (String line : lines) {
-                String processed = configHelper.applyPlaceholders(line, placeholders);
-                for (Player target : context.getPlayers()) {
-                    context.getMessagesAPI().sendRaw(target, processed);
+        for (Player target : context.getPlayers()) {
+            List<String> lines = moduleConfig.getTranslationList(target, multilinePath);
+            if (lines != null && !lines.isEmpty()) {
+                for (String line : lines) {
+                    context.getMessagesAPI().sendRaw(target, configHelper.applyPlaceholders(line, placeholders));
                 }
+                continue;
             }
-            return;
-        }
-
-        if (fallbackLine != null) {
-            String processed = configHelper.applyPlaceholders(fallbackLine, placeholders);
-            for (Player target : context.getPlayers()) {
-                context.getMessagesAPI().sendRaw(target, processed);
+            if (fallbackPath != null) {
+                String fallbackLine = moduleConfig.getTranslation(target, fallbackPath);
+                if (fallbackLine != null) {
+                    context.getMessagesAPI().sendRaw(target, configHelper.applyPlaceholders(fallbackLine, placeholders));
+                }
             }
         }
     }
@@ -152,8 +149,8 @@ public class RunFromTheBeastMessagingService {
     public void sendVictoryTitles(GameContext<Player, Location, World, Material, ItemStack, Sound, Block, Entity> context,
                                   String basePath,
                                   Map<String, String> placeholders) {
-        String rawTitle = moduleConfig.getStringFrom("language.yml", basePath + ".title");
-        String rawSubtitle = moduleConfig.getStringFrom("language.yml", basePath + ".subtitle");
+        String rawTitle = moduleConfig.getTranslation(null, basePath + ".title");
+        String rawSubtitle = moduleConfig.getTranslation(null, basePath + ".subtitle");
 
         if ((rawTitle == null || rawTitle.isEmpty()) && (rawSubtitle == null || rawSubtitle.isEmpty())) {
             return;
@@ -197,7 +194,7 @@ public class RunFromTheBeastMessagingService {
     }
 
     public String getRandomMessage(String path) {
-        List<String> messages = moduleConfig.getStringListFrom("language.yml", path);
+        List<String> messages = moduleConfig.getTranslationList(null, path);
         if (messages == null || messages.isEmpty()) {
             return null;
         }
@@ -205,4 +202,10 @@ public class RunFromTheBeastMessagingService {
         int index = ThreadLocalRandom.current().nextInt(messages.size());
         return messages.get(index);
     }
+
+    private static String formatCountdownTime(int seconds) {
+        int safeSeconds = Math.max(0, seconds);
+        return String.format("%02d:%02d", safeSeconds / 60, safeSeconds % 60);
+    }
+
 }

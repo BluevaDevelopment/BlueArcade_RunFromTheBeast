@@ -2,7 +2,7 @@ name: Run From The Beast
 id: run_from_the_beast
 version: ${revision}
 type: MINIGAME
-api-version: 3.3
+api-version: 3.4
 main: net.blueva.arcade.modules.runfromthebeast.RunFromTheBeastModule
 
 authors:

@@ -259,7 +259,7 @@ public class RunFromTheBeastGameManager {
             if (killer != null) {
                 statsService.addRunnerKill(killer);
             }
-            victim.setGameMode(GameMode.SPECTATOR);
+            context.setPlayerSpectating(victim, true);
             victim.getInventory().clear();
             distanceService.resetDistanceBar(victim);
             state.setEnded(true);
@@ -267,9 +267,9 @@ public class RunFromTheBeastGameManager {
             return;
         }
 
-        context.eliminatePlayer(victim, moduleConfig.getStringFrom("language.yml", "messages.eliminated"));
+        context.eliminatePlayer(victim, moduleConfig.getTranslation(victim, "messages.eliminated"));
         victim.getInventory().clear();
-        victim.setGameMode(GameMode.SPECTATOR);
+        context.setPlayerSpectating(victim, true);
         distanceService.resetDistanceBar(victim);
 
         if (killer != null && isBeast(context, state, killer)) {
@@ -337,7 +337,7 @@ public class RunFromTheBeastGameManager {
             beastService.applyBeastGlow(context, state, beast);
             loadoutService.applyBeastEquipment(beast);
             messagingService.sendBeastTitle(context, beast);
-            context.getMessagesAPI().sendRaw(beast, moduleConfig.getStringFrom("language.yml", "messages.roles.beast"));
+            context.getMessagesAPI().sendRaw(beast, moduleConfig.getTranslation(beast, "messages.roles.beast"));
             statsService.addBeastRole(beast);
         }
 
@@ -345,7 +345,7 @@ public class RunFromTheBeastGameManager {
             if (player.getUniqueId().equals(state.getBeastId())) {
                 continue;
             }
-            context.getMessagesAPI().sendRaw(player, moduleConfig.getStringFrom("language.yml", "messages.roles.runner"));
+            context.getMessagesAPI().sendRaw(player, moduleConfig.getTranslation(player, "messages.roles.runner"));
         }
     }
 
@@ -369,7 +369,7 @@ public class RunFromTheBeastGameManager {
             if (shouldNotifyRelease(state.getReleaseTimeSeconds())) {
                 for (Player player : context.getPlayers()) {
                     context.getMessagesAPI().sendRaw(player,
-                            moduleConfig.getStringFrom("language.yml", "messages.beast_release_countdown")
+                            moduleConfig.getTranslation(player, "messages.beast_release_countdown")
                                     .replace("{time}", String.valueOf(state.getReleaseTimeSeconds())));
                 }
             }
@@ -382,12 +382,12 @@ public class RunFromTheBeastGameManager {
                               RunFromTheBeastArenaState state) {
         Player beast = getBeast(context, state);
         if (beast != null) {
-            context.getMessagesAPI().sendRaw(beast, moduleConfig.getStringFrom("language.yml", "messages.beast_released_beast"));
+            context.getMessagesAPI().sendRaw(beast, moduleConfig.getTranslation(beast, "messages.beast_released_beast"));
         }
 
         for (Player player : context.getPlayers()) {
             if (beast != null && !player.getUniqueId().equals(beast.getUniqueId())) {
-                context.getMessagesAPI().sendRaw(player, moduleConfig.getStringFrom("language.yml", "messages.beast_released_runners"));
+                context.getMessagesAPI().sendRaw(player, moduleConfig.getTranslation(player, "messages.beast_released_runners"));
             }
         }
 
@@ -479,7 +479,7 @@ public class RunFromTheBeastGameManager {
         placeholders.put("runners", configHelper.formatPlayerList(runners));
 
         messagingService.sendOutcomeMessage(context, "messages.runners_win_lines",
-                moduleConfig.getStringFrom("language.yml", "messages.runners_win"),
+                "messages.runners_win",
                 placeholders);
         messagingService.sendVictoryTitles(context, "titles.victory.runners_won", placeholders);
         messagingService.showFinalScoreboard(context, "scoreboard.final.runners_won", placeholders);
@@ -510,8 +510,7 @@ public class RunFromTheBeastGameManager {
         placeholders.put("runners", configHelper.formatPlayerList(runners));
 
         messagingService.sendOutcomeMessage(context, "messages.beast_win_lines",
-                moduleConfig.getStringFrom("language.yml", "messages.beast_wins")
-                        .replace("{beast}", beast != null ? beast.getName() : "-"),
+                "messages.beast_wins",
                 placeholders);
         messagingService.sendVictoryTitles(context, "titles.victory.beast_won", placeholders);
         messagingService.showFinalScoreboard(context, "scoreboard.final.beast_won", placeholders);
@@ -541,4 +540,10 @@ public class RunFromTheBeastGameManager {
         Integer gameTime = context.getDataAccess().getGameData("basic.time", Integer.class);
         return (gameTime != null && gameTime > 0) ? gameTime : 240;
     }
+
+    private static String formatCountdownTime(int seconds) {
+        int safeSeconds = Math.max(0, seconds);
+        return String.format("%02d:%02d", safeSeconds / 60, safeSeconds % 60);
+    }
+
 }
