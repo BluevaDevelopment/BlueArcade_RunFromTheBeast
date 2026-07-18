@@ -62,6 +62,8 @@ messages:
     - " "
     - "<dark_gray><strikethrough>----------------------------------------------</strikethrough></dark_gray>"
   armory_beast_blocked: "<red>The armory is only for runners.</red>"
+  store:
+    reset_wand: "<green>Re-armed {count} nearby shredder traps.</green>"
   checkpoint:
     set: "<green>Checkpoint saved. Remaining uses: {uses}</green>"
     no_uses: "<red>You have no checkpoint uses left.</red>"

@@ -62,6 +62,8 @@ messages:
     - " "
     - "<dark_gray><strikethrough>----------------------------------------------</strikethrough></dark_gray>"
   armory_beast_blocked: "<red>La armería es solo para corredores.</red>"
+  store:
+    reset_wand: "<green>Has reactivado {count} trampas cercanas.</green>"
   checkpoint:
     set: "<green>Checkpoint guardado. Usos restantes: {uses}</green>"
     no_uses: "<red>No te quedan usos de punto de control.</red>"

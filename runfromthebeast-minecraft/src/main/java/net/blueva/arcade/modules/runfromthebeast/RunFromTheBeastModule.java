@@ -23,6 +23,7 @@ import net.blueva.arcade.modules.runfromthebeast.support.RunFromTheBeastCageServ
 import net.blueva.arcade.modules.runfromthebeast.support.RunFromTheBeastCheckpointService;
 import net.blueva.arcade.modules.runfromthebeast.support.RunFromTheBeastConfigHelper;
 import net.blueva.arcade.modules.runfromthebeast.support.RunFromTheBeastDistanceService;
+import net.blueva.arcade.modules.runfromthebeast.support.RunFromTheBeastDisguiseService;
 import net.blueva.arcade.modules.runfromthebeast.support.RunFromTheBeastLoadoutService;
 import net.blueva.arcade.modules.runfromthebeast.support.RunFromTheBeastMessagingService;
 import net.blueva.arcade.modules.runfromthebeast.support.RunFromTheBeastRewardService;
@@ -59,6 +60,8 @@ public class RunFromTheBeastModule implements GameModule<Player, Location, World
     private RunFromTheBeastGameManager gameManager;
     private RunFromTheBeastMessagingService messagingService;
     private RunFromTheBeastCheckpointService checkpointService;
+    private RunFromTheBeastStoreService storeService;
+    private RunFromTheBeastDisguiseService disguiseService;
 
     @Override
     public void onLoad() {
@@ -77,11 +80,12 @@ public class RunFromTheBeastModule implements GameModule<Player, Location, World
 
         RunFromTheBeastConfigHelper configHelper = new RunFromTheBeastConfigHelper();
         RunFromTheBeastStatsService statsService = new RunFromTheBeastStatsService(statsAPI, moduleInfo);
-        RunFromTheBeastStoreService storeService = new RunFromTheBeastStoreService(moduleConfig, storeAPI, moduleInfo, configHelper);
+        storeService = new RunFromTheBeastStoreService(moduleConfig, storeAPI, moduleInfo, configHelper);
         RunFromTheBeastCageService cageService = new RunFromTheBeastCageService(configHelper);
         RunFromTheBeastBeastService beastService = new RunFromTheBeastBeastService(moduleConfig, storeAPI);
         RunFromTheBeastLoadoutService loadoutService = new RunFromTheBeastLoadoutService(moduleConfig, configHelper);
         RunFromTheBeastDistanceService distanceService = new RunFromTheBeastDistanceService(moduleConfig);
+        disguiseService = new RunFromTheBeastDisguiseService();
         RunFromTheBeastRewardService rewardService = new RunFromTheBeastRewardService(moduleConfig);
         RunFromTheBeastArmoryService armoryService = new RunFromTheBeastArmoryService(moduleConfig, configHelper);
 
@@ -102,6 +106,8 @@ public class RunFromTheBeastModule implements GameModule<Player, Location, World
                 rewardService,
                 statsService,
                 armoryService,
+                storeService,
+                disguiseService,
                 configHelper
         );
 
@@ -237,6 +243,21 @@ public class RunFromTheBeastModule implements GameModule<Player, Location, World
         gameManager.handleDamage(context, state, victim, killer);
     }
 
+    public boolean isBeastDisguise(Entity entity) {
+        GameContext<Player, Location, World, Material, ItemStack, Sound, Block, Entity> context =
+                stateRegistry.getGameContextForDisguise(entity);
+        return context != null && disguiseService.isDisguise(getArenaState(context), entity);
+    }
+
+    public void handleDisguiseDamage(Entity disguise, Player attacker, double damage) {
+        GameContext<Player, Location, World, Material, ItemStack, Sound, Block, Entity> context =
+                stateRegistry.getGameContextForDisguise(disguise);
+        if (context == null) {
+            return;
+        }
+        gameManager.handleDisguiseDamage(context, getArenaState(context), attacker, damage);
+    }
+
     public void openArmory(Player player,
                            GameContext<Player, Location, World, Material, ItemStack, Sound, Block, Entity> context,
                            org.bukkit.block.Container container) {
@@ -250,6 +271,42 @@ public class RunFromTheBeastModule implements GameModule<Player, Location, World
 
     public Material getCheckpointReturnMaterial() {
         return checkpointService.getCheckpointReturnMaterial();
+    }
+
+    public boolean isShredderPlate(ItemStack item) {
+        return storeService.isShredderPlate(item);
+    }
+
+    public boolean isResetWand(ItemStack item) {
+        return storeService.isResetWand(item);
+    }
+
+    public void handleShredderPlaced(GameContext<Player, Location, World, Material, ItemStack, Sound, Block, Entity> context,
+                                     org.bukkit.event.block.BlockPlaceEvent event) {
+        RunFromTheBeastArenaState state = getArenaState(context);
+        if (state != null && isBeast(context, event.getPlayer())) {
+            storeService.registerShredderTrap(state, event.getBlockPlaced(), event.getBlockReplacedState().getType());
+        }
+    }
+
+    public void handleShredderTrigger(GameContext<Player, Location, World, Material, ItemStack, Sound, Block, Entity> context,
+                                      Player player,
+                                      Location location) {
+        RunFromTheBeastArenaState state = getArenaState(context);
+        if (state != null && !isBeast(context, player)) {
+            storeService.triggerShredderTrap(state, player, location);
+        }
+    }
+
+    public void handleResetWand(GameContext<Player, Location, World, Material, ItemStack, Sound, Block, Entity> context,
+                                Player player) {
+        RunFromTheBeastArenaState state = getArenaState(context);
+        if (state != null && isBeast(context, player)) {
+            int reset = storeService.resetNearbyTraps(state, player.getLocation());
+            String message = moduleConfig.getTranslation(player, "messages.store.reset_wand")
+                    .replace("{count}", String.valueOf(reset));
+            context.getMessagesAPI().sendRaw(player, message);
+        }
     }
 
     @Override

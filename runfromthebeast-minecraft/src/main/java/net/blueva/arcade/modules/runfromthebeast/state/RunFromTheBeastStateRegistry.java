@@ -39,6 +39,18 @@ public class RunFromTheBeastStateRegistry {
         return activeGames.get(arenaId);
     }
 
+    public GameContext<Player, Location, World, Material, ItemStack, Sound, Block, Entity> getGameContextForDisguise(Entity entity) {
+        if (entity == null) {
+            return null;
+        }
+        for (Map.Entry<Integer, RunFromTheBeastArenaState> entry : gameStates.entrySet()) {
+            if (entity.getUniqueId().equals(entry.getValue().getBeastDisguiseId())) {
+                return activeGames.get(entry.getKey());
+            }
+        }
+        return null;
+    }
+
     public RunFromTheBeastArenaState getState(int arenaId) {
         return gameStates.get(arenaId);
     }

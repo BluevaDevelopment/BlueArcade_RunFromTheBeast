@@ -16,8 +16,10 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
@@ -68,6 +70,10 @@ public class RunFromTheBeastListener implements Listener {
             return;
         }
 
+        if (context.getPhase() == GamePhase.PLAYING) {
+            module.handleShredderTrigger(context, player, to);
+        }
+
         if (!context.isInsideBounds(to)) {
             module.handleOutOfBounds(context, player, false);
             return;
@@ -95,6 +101,13 @@ public class RunFromTheBeastListener implements Listener {
         if (event.getItem() != null) {
             Material type = event.getItem().getType();
 
+            if (module.isResetWand(event.getItem())
+                    && (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
+                event.setCancelled(true);
+                module.handleResetWand(context, player);
+                return;
+            }
+
             if (type == module.getCheckpointSetMaterial()) {
                 event.setCancelled(true);
                 module.handleCheckpointSet(context, player);
@@ -114,6 +127,18 @@ public class RunFromTheBeastListener implements Listener {
                 event.setCancelled(true);
                 module.openArmory(player, context, container);
             }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onBlockPlace(BlockPlaceEvent event) {
+        Player player = event.getPlayer();
+        GameContext<Player, Location, World, Material, ItemStack, Sound, Block, Entity> context = module.getGameContext(player);
+        if (context == null || !context.isPlayerPlaying(player) || context.getPhase() != GamePhase.PLAYING) {
+            return;
+        }
+        if (module.isShredderPlate(event.getItemInHand())) {
+            module.handleShredderPlaced(context, event);
         }
     }
 
@@ -163,6 +188,28 @@ public class RunFromTheBeastListener implements Listener {
                 }
             }
             module.handleDamage(context, player, killer);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onDisguiseDamage(EntityDamageEvent event) {
+        if (!module.isBeastDisguise(event.getEntity())) {
+            return;
+        }
+
+        event.setCancelled(true);
+        if (event instanceof EntityDamageByEntityEvent damageByEntityEvent) {
+            Player attacker = resolveDamager(damageByEntityEvent);
+            if (attacker != null) {
+                module.handleDisguiseDamage(event.getEntity(), attacker, event.getFinalDamage());
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onDisguiseInteract(PlayerInteractEntityEvent event) {
+        if (module.isBeastDisguise(event.getRightClicked())) {
+            event.setCancelled(true);
         }
     }
 

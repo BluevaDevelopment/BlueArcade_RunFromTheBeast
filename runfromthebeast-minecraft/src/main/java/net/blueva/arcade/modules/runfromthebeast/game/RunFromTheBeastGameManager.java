@@ -15,10 +15,12 @@ import net.blueva.arcade.modules.runfromthebeast.support.RunFromTheBeastCageServ
 import net.blueva.arcade.modules.runfromthebeast.support.RunFromTheBeastCheckpointService;
 import net.blueva.arcade.modules.runfromthebeast.support.RunFromTheBeastConfigHelper;
 import net.blueva.arcade.modules.runfromthebeast.support.RunFromTheBeastDistanceService;
+import net.blueva.arcade.modules.runfromthebeast.support.RunFromTheBeastDisguiseService;
 import net.blueva.arcade.modules.runfromthebeast.support.RunFromTheBeastLoadoutService;
 import net.blueva.arcade.modules.runfromthebeast.support.RunFromTheBeastMessagingService;
 import net.blueva.arcade.modules.runfromthebeast.support.RunFromTheBeastRewardService;
 import net.blueva.arcade.modules.runfromthebeast.support.RunFromTheBeastStatsService;
+import net.blueva.arcade.modules.runfromthebeast.support.RunFromTheBeastStoreService;
 import org.bukkit.Material;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -49,6 +51,8 @@ public class RunFromTheBeastGameManager {
     private final RunFromTheBeastRewardService rewardService;
     private final RunFromTheBeastStatsService statsService;
     private final RunFromTheBeastArmoryService armoryService;
+    private final RunFromTheBeastStoreService storeService;
+    private final RunFromTheBeastDisguiseService disguiseService;
     private final RunFromTheBeastConfigHelper configHelper;
 
     public RunFromTheBeastGameManager(ModuleConfigAPI moduleConfig, CoreConfigAPI coreConfig, ModuleInfo moduleInfo,
@@ -62,6 +66,8 @@ public class RunFromTheBeastGameManager {
                                       RunFromTheBeastRewardService rewardService,
                                       RunFromTheBeastStatsService statsService,
                                       RunFromTheBeastArmoryService armoryService,
+                                      RunFromTheBeastStoreService storeService,
+                                      RunFromTheBeastDisguiseService disguiseService,
                                       RunFromTheBeastConfigHelper configHelper) {
         this.moduleConfig = moduleConfig;
         this.coreConfig = coreConfig;
@@ -76,6 +82,8 @@ public class RunFromTheBeastGameManager {
         this.rewardService = rewardService;
         this.statsService = statsService;
         this.armoryService = armoryService;
+        this.storeService = storeService;
+        this.disguiseService = disguiseService;
         this.configHelper = configHelper;
     }
 
@@ -128,6 +136,8 @@ public class RunFromTheBeastGameManager {
 
         cageService.restoreCage(context, state);
         beastService.removeBeastGlow(context, state);
+        disguiseService.remove(context, state, getBeast(context, state));
+        storeService.restoreShredderTraps(state);
         distanceService.resetDistanceBars(context);
         stateRegistry.removeGame(arenaId);
 
@@ -142,6 +152,8 @@ public class RunFromTheBeastGameManager {
             RunFromTheBeastArenaState state = stateRegistry.getState(context.getArenaId());
             cageService.restoreCage(context, state);
             beastService.removeBeastGlow(context, state);
+            disguiseService.remove(context, state, getBeast(context, state));
+            storeService.restoreShredderTraps(state);
             distanceService.resetDistanceBars(context);
             for (Player player : context.getPlayers()) {
                 context.getScoreboardAPI().clearFinalScoreboard(player);
@@ -256,6 +268,7 @@ public class RunFromTheBeastGameManager {
         playVisualEffects(victim, killer, deathLocation);
 
         if (isBeast(context, state, victim)) {
+            disguiseService.remove(context, state, victim);
             if (killer != null) {
                 statsService.addRunnerKill(killer);
             }
@@ -284,6 +297,19 @@ public class RunFromTheBeastGameManager {
                 handleBeastVictory(context, state, beast);
             }
         }
+    }
+
+    public void handleDisguiseDamage(
+            GameContext<Player, Location, World, Material, ItemStack, Sound, Block, Entity> context,
+            RunFromTheBeastArenaState state,
+            Player attacker,
+            double damage) {
+        Player beast = getBeast(context, state);
+        if (beast == null || attacker == null || attacker.equals(beast)
+                || !context.isPlayerPlaying(attacker) || damage <= 0.0) {
+            return;
+        }
+        beast.damage(damage, attacker);
     }
 
     private enum VoidFallAction {
@@ -336,6 +362,8 @@ public class RunFromTheBeastGameManager {
             loadoutService.applyStartingEffects(beast, "effects.beast_effects");
             beastService.applyBeastGlow(context, state, beast);
             loadoutService.applyBeastEquipment(beast);
+            String selectedSkin = storeService.applyBeastSelections(beast);
+            disguiseService.apply(context, state, beast, selectedSkin);
             messagingService.sendBeastTitle(context, beast);
             context.getMessagesAPI().sendRaw(beast, moduleConfig.getTranslation(beast, "messages.roles.beast"));
             statsService.addBeastRole(beast);

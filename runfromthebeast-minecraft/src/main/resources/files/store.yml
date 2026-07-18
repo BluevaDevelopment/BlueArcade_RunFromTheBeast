@@ -19,6 +19,18 @@ weights:
     default: 1
     bonus: 3
 
+# Gameplay values used by selectable Beast equipment and kits.
+gameplay:
+  shredder:
+    amount: 4
+    slow_duration_ticks: 80
+    slow_amplifier: 1
+  swiftness:
+    duration_ticks: 200
+    amplifier: 1
+  reset_wand:
+    radius: 12.0
+
 category_settings:
   root:
     id: "rftb_store"
@@ -112,6 +124,10 @@ category_settings:
         price: 0
         enabled: true
         default_unlocked: true
+        gameplay:
+          material: "WOODEN_HOE"
+          sharpness: 0
+          unbreaking: 0
         description:
           - "<gray>Entry-level zapper, gets the job done.</gray>"
           - "<gray>Reliable starter gear.</gray>"
@@ -121,6 +137,10 @@ category_settings:
         price: 200
         enabled: true
         default_unlocked: false
+        gameplay:
+          material: "STONE_HOE"
+          sharpness: 1
+          unbreaking: 1
         description:
           - "<gray>Heavier hits with sturdier stone.</gray>"
           - "<gray>Great early upgrade.</gray>"
@@ -130,6 +150,10 @@ category_settings:
         price: 600
         enabled: true
         default_unlocked: false
+        gameplay:
+          material: "IRON_HOE"
+          sharpness: 2
+          unbreaking: 2
         description:
           - "<gray>Durable zapper built for long hunts.</gray>"
           - "<gray>Better reach, better control.</gray>"
@@ -139,6 +163,10 @@ category_settings:
         price: 1500
         enabled: true
         default_unlocked: false
+        gameplay:
+          material: "DIAMOND_HOE"
+          sharpness: 4
+          unbreaking: 3
         description:
           - "<gray>Top-tier zapper for relentless Beasts.</gray>"
           - "<gray>Premium shock and longevity.</gray>"
