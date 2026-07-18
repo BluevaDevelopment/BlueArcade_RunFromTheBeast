@@ -8,10 +8,10 @@ import net.blueva.arcade.api.store.StoreCategoryType;
 import net.blueva.arcade.api.store.StoreItemDefinition;
 import net.blueva.arcade.api.store.StoreScope;
 import net.blueva.arcade.modules.runfromthebeast.state.RunFromTheBeastArenaState;
+import net.blueva.foundation.items.Items;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -223,9 +223,9 @@ public class RunFromTheBeastStoreService {
             default -> 0;
         };
         String base = itemPath("zappers", selected) + ".gameplay";
-        addEnchantment(zapper, Enchantment.DAMAGE_ALL,
+        Items.enchant(zapper, "SHARPNESS",
                 moduleConfig.getIntFrom("store.yml", base + ".sharpness", defaultSharpness));
-        addEnchantment(zapper, Enchantment.DURABILITY,
+        Items.enchant(zapper, "UNBREAKING",
                 moduleConfig.getIntFrom("store.yml", base + ".unbreaking", defaultUnbreaking));
         beast.getInventory().setItemInMainHand(zapper);
     }
@@ -305,12 +305,6 @@ public class RunFromTheBeastStoreService {
 
     private String getItemDisplayName(String categoryKey, String itemId) {
         return moduleConfig.getStringFrom("store.yml", itemPath(categoryKey, itemId) + ".name", itemId);
-    }
-
-    private void addEnchantment(ItemStack item, Enchantment enchantment, int level) {
-        if (level > 0) {
-            item.addUnsafeEnchantment(enchantment, level);
-        }
     }
 
     private RunFromTheBeastArenaState.ShredderTrap findTrap(RunFromTheBeastArenaState state, Location location) {
