@@ -30,9 +30,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>net.blueva.foundation</groupId>
+            <groupId>com.github.BluevaDevelopment</groupId>
             <artifactId>BlueFoundation</artifactId>
-            <version>[26.12,)</version>
+            <version>26.14</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
