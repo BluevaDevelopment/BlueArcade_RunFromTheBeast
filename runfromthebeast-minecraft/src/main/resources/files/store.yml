@@ -119,7 +119,7 @@ category_settings:
     items:
       order: [wood, stone, iron, diamond]
       wood:
-        name: "Wood Zapper"
+        name: "<yellow>Wood Zapper</yellow>"
         icon: "WOODEN_HOE"
         price: 0
         enabled: true
@@ -132,7 +132,7 @@ category_settings:
           - "<gray>Entry-level zapper, gets the job done.</gray>"
           - "<gray>Reliable starter gear.</gray>"
       stone:
-        name: "Stone Zapper"
+        name: "<white>Stone Zapper</white>"
         icon: "STONE_HOE"
         price: 200
         enabled: true
@@ -145,7 +145,7 @@ category_settings:
           - "<gray>Heavier hits with sturdier stone.</gray>"
           - "<gray>Great early upgrade.</gray>"
       iron:
-        name: "Iron Zapper"
+        name: "<aqua>Iron Zapper</aqua>"
         icon: "IRON_HOE"
         price: 600
         enabled: true
@@ -158,7 +158,7 @@ category_settings:
           - "<gray>Durable zapper built for long hunts.</gray>"
           - "<gray>Better reach, better control.</gray>"
       diamond:
-        name: "Diamond Zapper"
+        name: "<light_purple>Diamond Zapper</light_purple>"
         icon: "DIAMOND_HOE"
         price: 1500
         enabled: true
@@ -193,7 +193,7 @@ category_settings:
     items:
       order: [shredder, swiftness, reset_wand]
       shredder:
-        name: "Shredder Plates"
+        name: "<gold>Shredder Plates</gold>"
         icon: "LIGHT_WEIGHTED_PRESSURE_PLATE"
         price: 50
         enabled: true
@@ -202,7 +202,7 @@ category_settings:
           - "<gray>Drop plates to slow fleeing runners.</gray>"
           - "<gray>Useful for chokepoints.</gray>"
       swiftness:
-        name: "Swiftness Potion"
+        name: "<aqua>Swiftness Potion</aqua>"
         icon: "POTION"
         price: 10
         enabled: true
@@ -211,14 +211,14 @@ category_settings:
           - "<gray>Short burst of speed for quick catches.</gray>"
           - "<gray>Lightweight and affordable.</gray>"
       reset_wand:
-        name: "Reset Wand"
+        name: "<light_purple>Reset Wand</light_purple>"
         icon: "REDSTONE_TORCH"
         price: 60
         enabled: true
         default_unlocked: false
         description:
-          - "<gray>Reset nearby traps with a click.</gray>"
-          - "<gray>Great for mid-run control.</gray>"
+          - "<gray>Includes slowing plates to drop.</gray>"
+          - "<gray>Right-click the wand to re-arm triggered plates.</gray>"
   beast_pass:
     id: "rftb_beast_pass"
     name: "Beast Pass"

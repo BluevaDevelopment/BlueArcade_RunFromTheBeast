@@ -114,15 +114,18 @@ public class RunFromTheBeastDisguiseService {
             Entity disguise) {
         Set<UUID> arenaPlayers = new HashSet<>();
         for (Player viewer : context.getPlayers()) {
+            if (viewer == null) {
+                continue;
+            }
             arenaPlayers.add(viewer.getUniqueId());
             if (viewer.getUniqueId().equals(beast.getUniqueId())) {
                 viewer.hideEntity(corePlugin, disguise);
                 continue;
             }
-            if (!state.getBeastDisguiseViewers().contains(viewer.getUniqueId())) {
-                Players.hidePlayer(viewer, corePlugin, beast);
-                state.getBeastDisguiseViewers().add(viewer.getUniqueId());
-            }
+            // The core re-shows arena players on tab-list visibility refreshes,
+            // so the beast must be hidden again on every tick.
+            Players.hidePlayer(viewer, corePlugin, beast);
+            state.getBeastDisguiseViewers().add(viewer.getUniqueId());
             viewer.showEntity(corePlugin, disguise);
         }
 

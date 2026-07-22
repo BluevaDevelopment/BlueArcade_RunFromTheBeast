@@ -227,6 +227,7 @@ public class RunFromTheBeastStoreService {
                 moduleConfig.getIntFrom("store.yml", base + ".sharpness", defaultSharpness));
         Items.enchant(zapper, "UNBREAKING",
                 moduleConfig.getIntFrom("store.yml", base + ".unbreaking", defaultUnbreaking));
+        Items.name(zapper, getItemDisplayName("zappers", selected));
         beast.getInventory().setItemInMainHand(zapper);
     }
 
@@ -237,18 +238,29 @@ public class RunFromTheBeastStoreService {
         }
 
         switch (selected.toLowerCase(Locale.ROOT)) {
-            case "shredder" -> beast.getInventory().addItem(createMarkedItem(
-                    Material.LIGHT_WEIGHTED_PRESSURE_PLATE,
-                    Math.max(1, moduleConfig.getIntFrom("store.yml", "gameplay.shredder.amount", 4)),
-                    "shredder",
-                    getItemDisplayName("kits", selected)));
+            case "shredder" -> beast.getInventory().addItem(createShredderPlates());
             case "swiftness" -> beast.getInventory().addItem(createSwiftnessPotion(
                     getItemDisplayName("kits", selected)));
-            case "reset_wand" -> beast.getInventory().addItem(createMarkedItem(
-                    Material.REDSTONE_TORCH, 1, "reset_wand", getItemDisplayName("kits", selected)));
+            case "reset_wand" -> {
+                // The wand re-arms triggered plates, so the kit bundles both items.
+                beast.getInventory().addItem(createShredderPlates());
+                beast.getInventory().addItem(createMarkedItem(
+                        Material.REDSTONE_TORCH, 1, "reset_wand",
+                        getItemDisplayName("kits", selected),
+                        getItemDescription("kits", selected)));
+            }
             default -> {
             }
         }
+    }
+
+    private ItemStack createShredderPlates() {
+        return createMarkedItem(
+                Material.LIGHT_WEIGHTED_PRESSURE_PLATE,
+                Math.max(1, moduleConfig.getIntFrom("store.yml", "gameplay.shredder.amount", 4)),
+                "shredder",
+                getItemDisplayName("kits", "shredder"),
+                getItemDescription("kits", "shredder"));
     }
 
     private ItemStack createSwiftnessPotion(String displayName) {
@@ -259,25 +271,31 @@ public class RunFromTheBeastStoreService {
             int amplifier = Math.max(0, moduleConfig.getIntFrom(
                     "store.yml", "gameplay.swiftness.amplifier", 1));
             meta.addCustomEffect(new PotionEffect(PotionEffectType.SPEED, duration, amplifier), true);
-            if (displayName != null && !displayName.isBlank()) {
-                meta.setDisplayName(displayName);
-            }
+            meta.setColor(org.bukkit.Color.AQUA);
             potion.setItemMeta(meta);
         }
+        Items.name(potion, displayName);
+        Items.lore(potion, getItemDescription("kits", "swiftness"));
+        addGlint(potion);
         return potion;
     }
 
-    private ItemStack createMarkedItem(Material material, int amount, String marker, String displayName) {
+    private ItemStack createMarkedItem(Material material, int amount, String marker, String displayName, List<String> lore) {
         ItemStack item = new ItemStack(material, amount);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             meta.setLocalizedName(ITEM_MARKER_PREFIX + marker);
-            if (displayName != null && !displayName.isBlank()) {
-                meta.setDisplayName(displayName);
-            }
             item.setItemMeta(meta);
         }
+        Items.name(item, displayName);
+        Items.lore(item, lore);
+        addGlint(item);
         return item;
+    }
+
+    private void addGlint(ItemStack item) {
+        Items.enchant(item, "UNBREAKING", 1);
+        Items.flags(item, "HIDE_ENCHANTS");
     }
 
     private boolean hasMarker(ItemStack item, String marker) {
@@ -305,6 +323,11 @@ public class RunFromTheBeastStoreService {
 
     private String getItemDisplayName(String categoryKey, String itemId) {
         return moduleConfig.getStringFrom("store.yml", itemPath(categoryKey, itemId) + ".name", itemId);
+    }
+
+    private List<String> getItemDescription(String categoryKey, String itemId) {
+        List<String> description = moduleConfig.getStringListFrom("store.yml", itemPath(categoryKey, itemId) + ".description");
+        return description != null ? description : List.of();
     }
 
     private RunFromTheBeastArenaState.ShredderTrap findTrap(RunFromTheBeastArenaState state, Location location) {
